@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:otto/domain/entities/athmosphere/atmospheric_pressure.dart';
 
 void main() {
   runApp(const MyApp());
@@ -66,6 +67,8 @@ class _MyHomePageState extends State<MyHomePage> {
       // called again, and so nothing would appear to happen.
       _counter++;
     });
+    const p = AtmosphericPressure(value: 10);
+    // print(p.findQNHFromPressure(alt))
   }
 
   @override

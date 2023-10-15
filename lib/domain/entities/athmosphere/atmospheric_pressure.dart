@@ -3,20 +3,26 @@
 
 import 'dart:math';
 
+import 'package:freezed_annotation/freezed_annotation.dart';
+
+part 'atmospheric_pressure.freezed.dart';
+
 const double k1 = 0.190263;
 const double invK1 = 1.0 / k1;
 const double k2 = 8.417286e-5;
 const double invK2 = 1.0 / k2;
 
 /// ICAO Standard Atmosphere calculations (valid in Troposphere, alt<11000m)
-///
-class AtmosphericPressure {
-  /// Pressure in hPa
-  final double value;
+@freezed
+class AtmosphericPressure with _$AtmosphericPressure {
+  /// [value] the pressure in hPa
 
-  /// @param value the pressure in hPa
+  const factory AtmosphericPressure(
+      {required
 
-  const AtmosphericPressure(this.value);
+          /// Pressure in hPa
+          final double
+          value}) = _AtmosphericPressure;
 
   /// Returns an object representing zero pressure.  This value doesn't
   /// make a lot of practical sense (unless you're an astronaut), but
@@ -24,20 +30,20 @@ class AtmosphericPressure {
   /// "invalid" (IsPlausible() returns false).
 
   factory AtmosphericPressure.zero() {
-    return const AtmosphericPressure(0);
+    return const _AtmosphericPressure(value: 0);
   }
 
   /// Returns an object representing the standard pressure (1013.25 hPa).
   factory AtmosphericPressure.standard() {
-    return const AtmosphericPressure(1013.25);
+    return const _AtmosphericPressure(value: 1013.25);
   }
 
-  factory AtmosphericPressure.pascal(double value) {
-    return AtmosphericPressure(value / 100);
+  factory AtmosphericPressure.pascal(double pressure) {
+    return _AtmosphericPressure(value: (pressure / 100));
   }
 
-  factory AtmosphericPressure.hectoPascal(double value) {
-    return AtmosphericPressure(value);
+  factory AtmosphericPressure.hectoPascal(double pressure) {
+    return _AtmosphericPressure(value: pressure);
   }
 
   /// Is this a plausible value?
@@ -75,8 +81,8 @@ class AtmosphericPressure {
   /// Calculates the current QNH by comparing a pressure value to a
   /// known altitude of a certain location
   ///
-  /// @param pressure Current pressure
-  /// @param alt_known Altitude of a known location (m)
+  /// [pressure] Current pressure
+  /// [alt_known] Altitude of a known location (m)
 
   static AtmosphericPressure findQNHFromPressure(
       AtmosphericPressure pressure, double altKnown) {
@@ -84,7 +90,7 @@ class AtmosphericPressure {
   }
 
   /// Converts altitude with QNH=1013.25 reference to QNH adjusted altitude
-  /// @param alt 1013.25-based altitude (m)
+  /// [alt] 1013.25-based altitude (m)
   /// @return QNH-based altitude (m)
 
   double pressureAltitudeToQNHAltitude(double alt) {
@@ -92,7 +98,7 @@ class AtmosphericPressure {
   }
 
   /// Converts QNH adjusted altitude to pressure altitude (with QNH=1013.25 as reference)
-  /// @param alt QNH-based altitude(m)
+  /// [alt] QNH-based altitude(m)
   /// @return pressure altitude (m)
 
   double qnhAltitudeToPressureAltitude(double alt) {
@@ -106,7 +112,7 @@ class AtmosphericPressure {
   /// Example:
   /// QNH=1014, ps=100203 => alt = 100
   /// @see QNHAltitudeToStaticPressure
-  /// @param ps Air pressure
+  /// [ps] Air pressure
   /// @return Altitude over QNH-based zero (m)
 
   double staticPressureToQNHAltitude(AtmosphericPressure ps) {
@@ -120,7 +126,7 @@ class AtmosphericPressure {
   /// Example:
   /// alt= 100, QNH=1014 => ps = 100203 Pa
   /// @see StaticPressureToAltitude
-  /// @param alt Altitude over QNH-based zero (m)
+  /// [alt] Altitude over QNH-based zero (m)
   /// @return Air pressure at given altitude
 
   AtmosphericPressure qnhAltitudeToStaticPressure(double alt) {
@@ -129,7 +135,7 @@ class AtmosphericPressure {
   }
 
   /// Converts a pressure value to pressure altitude (with QNH=1013.25 as reference)
-  /// @param ps Air pressure
+  /// [ps] Air pressure
   /// @return pressure altitude (m)
 
   static double staticPressureToPressureAltitude(AtmosphericPressure ps) {
@@ -139,7 +145,7 @@ class AtmosphericPressure {
   /// Converts a 1013.25 hPa based altitude to the corresponding pressure
   ///
   /// @see StaticPressureToAltitude
-  /// @param alt Altitude over 1013.25 hPa based zero(m)
+  /// [alt] Altitude over 1013.25 hPa based zero(m)
   /// @return Air pressure at given altitude
 
   static AtmosphericPressure pressureAltitudeToStaticPressure(double alt) {
