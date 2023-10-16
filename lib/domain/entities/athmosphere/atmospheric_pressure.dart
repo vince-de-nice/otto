@@ -14,9 +14,11 @@ const double invK2 = 1.0 / k2;
 
 /// ICAO Standard Atmosphere calculations (valid in Troposphere, alt<11000m)
 @freezed
-abstract class AtmosphericPressure with _$AtmosphericPressure {
-  /// [value] the pressure in hPa
+ class AtmosphericPressure with _$AtmosphericPressure {
 
+const AtmosphericPressure._();
+
+  /// [value] the pressure in hPa
   const factory AtmosphericPressure(
       {required
 

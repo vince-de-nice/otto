@@ -91,8 +91,8 @@ class __$$AtmosphericPressureImplCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _$AtmosphericPressureImpl implements _AtmosphericPressure {
-  const _$AtmosphericPressureImpl({required this.value});
+class _$AtmosphericPressureImpl extends _AtmosphericPressure {
+  const _$AtmosphericPressureImpl({required this.value}) : super._();
 
   @override
   final double value;
@@ -121,9 +121,10 @@ class _$AtmosphericPressureImpl implements _AtmosphericPressure {
           this, _$identity);
 }
 
-abstract class _AtmosphericPressure implements AtmosphericPressure {
+abstract class _AtmosphericPressure extends AtmosphericPressure {
   const factory _AtmosphericPressure({required final double value}) =
       _$AtmosphericPressureImpl;
+  const _AtmosphericPressure._() : super._();
 
   @override
   double get value;
