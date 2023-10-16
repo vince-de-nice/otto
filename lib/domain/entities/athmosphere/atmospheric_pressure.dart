@@ -14,7 +14,7 @@ const double invK2 = 1.0 / k2;
 
 /// ICAO Standard Atmosphere calculations (valid in Troposphere, alt<11000m)
 @freezed
-class AtmosphericPressure with _$AtmosphericPressure {
+abstract class AtmosphericPressure with _$AtmosphericPressure {
   /// [value] the pressure in hPa
 
   const factory AtmosphericPressure(
@@ -28,7 +28,6 @@ class AtmosphericPressure with _$AtmosphericPressure {
   /// make a lot of practical sense (unless you're an astronaut), but
   /// it may be used internally to mark an instance of this class
   /// "invalid" (IsPlausible() returns false).
-
   factory AtmosphericPressure.zero() {
     return const _AtmosphericPressure(value: 0);
   }
@@ -47,7 +46,6 @@ class AtmosphericPressure with _$AtmosphericPressure {
   }
 
   /// Is this a plausible value?
-
   bool isPlausible() {
     return value > 100 && value < 1200;
   }
@@ -83,7 +81,6 @@ class AtmosphericPressure with _$AtmosphericPressure {
   ///
   /// [pressure] Current pressure
   /// [alt_known] Altitude of a known location (m)
-
   static AtmosphericPressure findQNHFromPressure(
       AtmosphericPressure pressure, double altKnown) {
     return pressure.qnhAltitudeToStaticPressure(-altKnown);
@@ -92,15 +89,14 @@ class AtmosphericPressure with _$AtmosphericPressure {
   /// Converts altitude with QNH=1013.25 reference to QNH adjusted altitude
   /// [alt] 1013.25-based altitude (m)
   /// @return QNH-based altitude (m)
-
   double pressureAltitudeToQNHAltitude(double alt) {
-    return staticPressureToQNHAltitude(pressureAltitudeToStaticPressure(alt));
+    return staticPressureToQNHAltitude(
+        AtmosphericPressure.pressureAltitudeToStaticPressure(alt));
   }
 
   /// Converts QNH adjusted altitude to pressure altitude (with QNH=1013.25 as reference)
   /// [alt] QNH-based altitude(m)
   /// @return pressure altitude (m)
-
   double qnhAltitudeToPressureAltitude(double alt) {
     return staticPressureToPressureAltitude(qnhAltitudeToStaticPressure(alt));
   }
@@ -114,7 +110,6 @@ class AtmosphericPressure with _$AtmosphericPressure {
   /// @see QNHAltitudeToStaticPressure
   /// [ps] Air pressure
   /// @return Altitude over QNH-based zero (m)
-
   double staticPressureToQNHAltitude(AtmosphericPressure ps) {
     return (pow(getHectoPascal(), k1) - pow(ps.getHectoPascal(), k1)) * invK2;
   }
@@ -128,7 +123,6 @@ class AtmosphericPressure with _$AtmosphericPressure {
   /// @see StaticPressureToAltitude
   /// [alt] Altitude over QNH-based zero (m)
   /// @return Air pressure at given altitude
-
   AtmosphericPressure qnhAltitudeToStaticPressure(double alt) {
     return AtmosphericPressure.hectoPascal(
         pow((pow(getHectoPascal(), k1) - k2 * alt), invK1).toDouble());
@@ -137,7 +131,6 @@ class AtmosphericPressure with _$AtmosphericPressure {
   /// Converts a pressure value to pressure altitude (with QNH=1013.25 as reference)
   /// [ps] Air pressure
   /// @return pressure altitude (m)
-
   static double staticPressureToPressureAltitude(AtmosphericPressure ps) {
     return AtmosphericPressure.standard().staticPressureToQNHAltitude(ps);
   }
@@ -147,8 +140,7 @@ class AtmosphericPressure with _$AtmosphericPressure {
   /// @see StaticPressureToAltitude
   /// [alt] Altitude over 1013.25 hPa based zero(m)
   /// @return Air pressure at given altitude
-
-  static AtmosphericPressure pressureAltitudeToStaticPressure(double alt) {
+  factory AtmosphericPressure.pressureAltitudeToStaticPressure(double alt) {
     return AtmosphericPressure.standard().qnhAltitudeToStaticPressure(alt);
   }
 }

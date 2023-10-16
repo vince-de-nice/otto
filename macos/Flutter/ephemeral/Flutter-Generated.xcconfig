@@ -1,6 +1,6 @@
 // This is a generated file; do not edit or check into version control.
-FLUTTER_ROOT=C:\Users\vmiri\Documents\flutter
-FLUTTER_APPLICATION_PATH=C:\Users\vmiri\Documents\projets\otto
+FLUTTER_ROOT=/Users/MIRINE/fvm/versions/stable
+FLUTTER_APPLICATION_PATH=/Users/MIRINE/Documents/perso/Planeur/otto
 COCOAPODS_PARALLEL_CODE_SIGN=true
 FLUTTER_BUILD_DIR=build
 FLUTTER_BUILD_NAME=1.0.0
