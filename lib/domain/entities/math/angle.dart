@@ -189,12 +189,12 @@ class Angle {
     return value < 0;
   }
 
-//TODO
-  // (double sin, double cos)  sinCos()  {
-  //   double sin = math.sin(radians());
-  //   double cos = math.cos(radians());
-  //   return (sin,cos);
-  // }
+
+  (double sin, double cos)  sinCos()  {
+    double sin = math.sin(radians());
+    double cos = math.cos(radians());
+    return (sin,cos);
+  }
 
 //   double absoluteDegrees()
 // {

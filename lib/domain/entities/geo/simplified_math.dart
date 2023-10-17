@@ -35,42 +35,43 @@ earthDistance( double a)
   assert(loc1.isValid());
   assert(loc2.isValid());
 
-  final sc1 = loc1.latitude.sinCos();
-  final sin_lat1 = sc1.first, cos_lat1 = sc1.second;
-  final sc2 = loc2.latitude.sinCos();
-  final sin_lat2 = sc2.first, cos_lat2 = sc2.second;
+  final (sinLat1,cosLat1) = loc1.latitude.sinCos();
+
+  final (sinLat2,cosLat2) = loc2.latitude.sinCos();
+
+
 
   const Angle dlon = loc2.longitude - loc1.longitude;
 
-  if (distance != 0) {
+
     final s1 = (loc2.latitude - loc1.latitude).accurateHalfSin();
-    final s2 = dlon.accurate_half_sin();
-    final a = square(s1) + cos_lat1 * cos_lat2 * square(s2);
+    final s2 = dlon.accurateHalfSin();
+    final a = square(s1) + cosLat1 * cosLat2 * square(s2);
 
-    Angle distance2 = earthDistance(a);
-    assert(!distance2.isNegative());
-    *distance = distance2;
-  }
+    Angle distance = earthDistance(a);
+    assert(!distance.isNegative());
 
-  if (bearing) {
-    final sc = dlon.sinCos();
-    final sin_dlon = sc.first, cos_dlon = sc.second;
 
-    final y = sin_dlon * cos_lat2;
-    final x = cos_lat1 * sin_lat2 - sin_lat1 * cos_lat2 * cos_dlon;
 
-    *bearing = (x == 0 && y == 0)
+  
+    final(sinDlon,cosDlon) = dlon.sinCos();
+   
+
+    final y = sinDlon * cosLat2;
+    final x = cosLat1 * sinLat2 - sinLat1 * cosLat2 * cosDlon;
+
+ 
+
+      return (distance,(x == 0 && y == 0)
       ? Angle.zero()
-      : Angle.fromXY(x, y).asBearing();
+      : Angle.fromXY(x, y).asBearing());
   }
-}
 
-Angle
-distanceBearingS(GeoPoint loc1, GeoPoint loc2,
-                  Angle bearing) {
 
-   final Angle distance_angle =  distanceBearingS(loc1, loc2, bearing);
-    return angleToEarthDistance(distance_angle);
+Angle distanceBearingS(GeoPoint loc1, GeoPoint loc2,   Angle bearing) {
+
+   final Angle distanceAngle =  distanceBearingS(loc1, loc2, bearing);
+    return angleToEarthDistance(distanceAngle);
 }
 
 /// @see FindLatitudeLongitude()
@@ -87,42 +88,40 @@ findLatitudeLongitudeS(GeoPoint loc,
 
    Angle distanceAngle = earthDistanceToAngle(distance);
 
-  final scd = distanceAngle.sinCos();
-  final sin_distance = scd.first, cos_distance = scd.second;
+  final (sinDistance,cosDistance) = distanceAngle.sinCos();
 
-  final scb = bearing.sinCos();
-  final sin_bearing = scb.first, cos_bearing = scb.second;
 
-  final scl = loc.latitude.sinCos();
-  final sin_latitude = scl.first, cos_latitude = scl.second;
+  final (sinBearing,cosBearing) = bearing.sinCos();
 
-  GeoPoint loc_out;
-  loc_out.latitude = Angle.asin(sin_latitude * cos_distance
-                                 + cos_latitude * sin_distance * cos_bearing);
 
-  loc_out.longitude = loc.longitude +
-    Angle.fromXY(cos_distance - sin_latitude * loc_out.latitude.sin(),
-                  sin_bearing * sin_distance * cos_latitude);
+  final (sinLatitude,cosLatitude) = loc.latitude.sinCos();
 
-  return loc_out.normalize();// ensure longitude is within -180:180
+
+  Angle locOutLatitude = Angle.asin(sinLatitude * cosDistance
+                                 + cosLatitude * sinDistance * cosBearing);
+
+  Angle locOutLongitude = loc.longitude +
+    Angle.fromXY(cosDistance - sinLatitude * locOutLatitude.latitude.sin(),
+                  sinBearing * sinDistance * cosLatitude);
+
+  return GeoPoint(latitude: locOutLatitude, longitude: locOutLongitude).normalize();// ensure longitude is within -180:180
 }
 
 /// @see ProjectedDistance()
 
 double
-projectedDistanceS(GeoPoint loc1, GeoPoint loc2,
-                   GeoPoint loc3) {
-  Angle dist_AD, crs_AD;
- distanceBearingS(loc1, loc3, &dist_AD, &crs_AD);
-  if (!dist_AD.isPositive()){
+projectedDistanceS(GeoPoint loc1, GeoPoint loc2, GeoPoint loc3) {
+  
+ final (Angle distAd, Angle crsAd) = distanceBearingS(loc1, loc3);
+  if (!distAd.isPositive()){
     /* workaround: new sine implementation may return small non-zero
        values for sin(0) */
     return 0;
   }
 
-  Angle dist_AB, crs_AB;
-  distanceBearingS(loc1, loc2, &dist_AB, &crs_AB);
-  if (!dist_AB.isPositive()){
+ final  (Angle distAb, Angle crsAb)=
+  distanceBearingS(loc1, loc2);
+  if (!distAb.isPositive()){
     /* workaround: new sine implementation may return small non-zero
        values for sin(0) */
     return 0;
@@ -131,16 +130,16 @@ projectedDistanceS(GeoPoint loc1, GeoPoint loc2,
   // The "along track distance", along_track_distance, the distance from A along the
   // course towards B to the point abeam D
 
-  final sindist_AD = dist_AD.sin();
-  final cross_track_distance =
-    Angle.asin(sindist_AD * (crs_AD - crs_AB).sin());
+  final sindistAd = distAd.sin();
+  final crossTrackDistance =
+    Angle.asin(sindistAd * (crsAd - crsAb).sin());
 
-  final sc = cross_track_distance.sinCos();
-  final sinXTD = sc.first, cosXTD = sc.second;
+  final (double sinXTD,double cosXTD) = crossTrackDistance.sinCos();
+
 
   // along track distance
-   Angle along_track_distance =
-    Angle.asin(cathetus(sindist_AD, sinXTD) / cosXTD);
+   Angle alongTrackDistance =
+    Angle.asin(cathetus(sindistAd, sinXTD) / cosXTD);
 
-  return angleToEarthDistance(along_track_distance);
+  return angleToEarthDistance(alongTrackDistance);
 }

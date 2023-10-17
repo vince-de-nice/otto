@@ -135,22 +135,22 @@ latitude:
   /// @return Modified point
 
    GeoPoint operator+( GeoPoint delta)   {
-    GeoPoint res = this;
-    res.longitude += delta.longitude;
-    res.latitude += delta.latitude;
-    return res;
+    return GeoPoint(longitude: 
+    longitude + delta.longitude,latitude:
+    latitude + delta.latitude);
+
   }
 
-  /// Add a delta to a point
-  ///
-  /// @param delta Delta to add
-  ///
-  /// @return Modified point
-    GeoPoint operator+=( GeoPoint delta)  {
-   return GeoPoint(longitude: longitude + delta.longitude
-    ,latitude:latitude + delta.latitude);
+  // /// Add a delta to a point
+  // ///
+  // /// @param delta Delta to add
+  // ///
+  // /// @return Modified point
+  //   GeoPoint operator+=( GeoPoint delta)  {
+  //  return GeoPoint(longitude: longitude + delta.longitude
+  //   ,latitude:latitude + delta.latitude);
     
-  }
+  // }
 
   /// Subtracts a delta from a point
   ///
@@ -164,25 +164,25 @@ latitude:
 
   }
 
-  /// Calculate great circle distance from this to the other
-  ///
-  /// @param other Other location
-  ///
-  /// @return Distance (m)
+//   /// Calculate great circle distance from this to the other
+//   ///
+//   /// @param other Other location
+//   ///
+//   /// @return Distance (m)
 
-  double Distance( GeoPoint other) {
-  return ::Distance(this, other);
-}
+//   double Distance( GeoPoint other) {
+//   return distance(this, other);
+// }
 
-  /// Calculate great circle initial bearing from this to the other
-  ///
-  /// @param other Other location
-  ///
-  /// @return Bearing (deg)
+//   /// Calculate great circle initial bearing from this to the other
+//   ///
+//   /// @param other Other location
+//   ///
+//   /// @return Bearing (deg)
 
-  Angle Bearing( GeoPoint &other) {
-  return ::Bearing(this, other);
-}
+//   Angle Bearing( GeoPoint other) {
+//   return bearing(this, other);
+// }
 
   /// Calculate great circle distance and initial bearing from this to the other
 
@@ -197,16 +197,16 @@ latitude:
 
   double distanceS( GeoPoint other) {
   double distance;
-  ::DistanceBearingS(this, other, &distance, nullptr);
+  distanceBearingS(this, other, &distance, nullptr);
   return distance;
 }
 
   /// Like Bearing(), but use a simplified faster formula that may be
   /// less accurate.
 
-  Angle BearingS( GeoPoint other) {
+  Angle bearingS( GeoPoint other) {
   Angle angle;
-  ::DistanceBearingS(this, other, (Angle *)nullptr, &angle);
+  distanceBearingS(this, other, (Angle *)nullptr, &angle);
   return angle;
 }
 
@@ -229,7 +229,7 @@ latitude:
 
   double projectedDistance( GeoPoint from,
                             GeoPoint to) {
-  return ::ProjectedDistance(from, to, this);
+  return projectedDistance(from, to, this);
 }
 
   /// Find point a set distance along a great-circle path towards
@@ -242,14 +242,14 @@ latitude:
 
   GeoPoint intermediatePoint( GeoPoint destination,
                              double distance) {
-  return :intermediatePoint(this, destination, distance);
+  return intermediatePoint(this, destination, distance);
 }
 
   /// Find the nearest great-circle middle point between this point and
   /// the specified one.
 
   GeoPoint middle( GeoPoint other) {
-  return ::middle(this, other);
+  return middle(this, other);
 }
 
 
