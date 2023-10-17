@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 // Copyright The XCSoar Project
 
-
-
 // #include "Math/Angle.hpp"
 // #include "Math/Classify.hpp"
 
@@ -10,10 +8,11 @@
 
 // struct GeoVector;
 
-import 'package:flutter/foundation.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 import 'package:otto/domain/entities/math/angle.dart';
+
+import 'simplified_math.dart';
 part 'geo_point.freezed.dart';
 
 /// Geodetic coordinate expressed as Longitude and Latitude angles.
@@ -22,7 +21,7 @@ class GeoPoint with _$GeoPoint {
   // Angle longitude;
   // Angle latitude;
   const GeoPoint._();
-  
+
   // /// Non-initialising constructor.
   // GeoPoint()  = default;
 
@@ -32,24 +31,23 @@ class GeoPoint with _$GeoPoint {
   /// @param _Latitude Latitude of point
   ///
   /// @return Initialised object
-  const factory GeoPoint({required  Angle longitude, required Angle latitude})=_GeoPoint ;
-   
-
+  const factory GeoPoint({required Angle longitude, required Angle latitude})=_GeoPoint;
+      
   /// Construct an instance at the origin of the coordinate system.
   /// This is used to initialise the simulator when there is no better
   /// reference (home, map center).  The goal is to bootstrap the
   /// simulator when XCSoar is launched for the first time with an
   /// empty profile; it is pretty useless for anything else.
-   factory  GeoPoint.zero()  {
-    return GeoPoint(Angle.zero(), Angle.zero())=_Zero;
+  factory GeoPoint.zero() {
+    return GeoPoint(latitude: Angle.zero(), longitude: Angle.zero());
   }
 
   /// Construct an instance that is "invalid", i.e. IsValid() will
   /// return false.  The return value must not be used in any
   /// calculation.  This method may be used to explicitly declare a
   /// GeoPoint attribute as "invalid".
-  factory  GeoPoint.invalid()  {
-    return GeoPoint(Angle.zero(), Angle.fullCircle())=_Invalid;
+  factory GeoPoint.invalid() {
+    return GeoPoint(longitude: Angle.zero(), latitude: Angle.fullCircle());
   }
 
   // /// Set this instance to "invalid", i.e. IsValid() will
@@ -65,32 +63,29 @@ class GeoPoint with _$GeoPoint {
   /// constructed by Invalid().  This is not an extensive plausibility
   /// check; it is only designed to catch instances created by
   /// Invalid().
-   bool isValid()   {
+  bool isValid() {
     return latitude <= Angle.halfCircle();
   }
 
   /// Check if both longitude and latitude are in the allowed range.
-   bool check()   {
-    return isFinite(longitude.native()) &&
-      longitude >= -Angle.halfCircle() &&
-      longitude <= Angle.halfCircle() &&
-      isFinite(latitude.native()) &&
-      latitude >= -Angle.quarterCircle() &&
-      latitude <= Angle.quarterCircle();
+  bool check() {
+    return longitude >= -Angle.halfCircle() &&
+        longitude <= Angle.halfCircle() &&
+        latitude >= -Angle.quarterCircle() &&
+        latitude <= Angle.quarterCircle();
   }
 
   /// Normalize the values, so this object can be used properly in
   /// calculations, without unintended side effects (such as -1 degrees
-  /// vs 359 degrees). 
-  GeoPoint normalize()  {
-    return GeoPoint(longitude : longitude.asDelta(),
-latitude:
-     (latitude < -Angle.quarterCircle()) ? 
-       -Angle.quarterCircle() :
- ((latitude > Angle.quarterCircle())?
-       Angle.quarterCircle() :latitude)
-
-    );
+  /// vs 359 degrees).
+  GeoPoint normalize() {
+    return GeoPoint(
+        longitude: longitude.asDelta(),
+        latitude: (latitude < -Angle.quarterCircle())
+            ? -Angle.quarterCircle()
+            : ((latitude > Angle.quarterCircle())
+                ? Angle.quarterCircle()
+                : latitude));
   }
 
   /// Find location a parametric distance along a vector from this point
@@ -100,10 +95,9 @@ latitude:
   ///
   /// @return Location of point
 
-  GeoPoint parametric( GeoPoint delta, double t) {
-  return this + delta * t;
-}
-
+  GeoPoint parametric(GeoPoint delta, double t) {
+    return this + delta * t;
+  }
 
   /// Find location interpolated from this point towards end
   ///
@@ -112,9 +106,9 @@ latitude:
   ///
   /// @return Location of point
 
-  GeoPoint interpolate( GeoPoint end, double t) {
-  return (this) + (end - (this)) * t;
-}
+  GeoPoint interpolate(GeoPoint end, double t) {
+    return (this) + (end - (this)) * t;
+  }
 
   /// Multiply a point by a factor (used for deltas)
   ///
@@ -122,10 +116,8 @@ latitude:
   ///
   /// @return Modified point
 
-   GeoPoint operator*( double x)   {
-    return GeoPoint (longitude: longitude * x, latitude:
-    latitude * x
-    );
+  GeoPoint operator *(double x) {
+    return GeoPoint(longitude: longitude * x, latitude: latitude * x);
   }
 
   /// Add a delta to a point
@@ -134,11 +126,10 @@ latitude:
   ///
   /// @return Modified point
 
-   GeoPoint operator+( GeoPoint delta)   {
-    return GeoPoint(longitude: 
-    longitude + delta.longitude,latitude:
-    latitude + delta.latitude);
-
+  GeoPoint operator +(GeoPoint delta) {
+    return GeoPoint(
+        longitude: longitude + delta.longitude,
+        latitude: latitude + delta.latitude);
   }
 
   // /// Add a delta to a point
@@ -149,7 +140,7 @@ latitude:
   //   GeoPoint operator+=( GeoPoint delta)  {
   //  return GeoPoint(longitude: longitude + delta.longitude
   //   ,latitude:latitude + delta.latitude);
-    
+
   // }
 
   /// Subtracts a delta from a point
@@ -158,10 +149,11 @@ latitude:
   ///
   /// @return Modified point
 
-  GeoPoint operator-( GeoPoint delta)   {
-    return GeoPoint(longitude: longitude - delta.longitude
-    ,latitude:latitude - delta.latitude).normalize();
-
+  GeoPoint operator -(GeoPoint delta) {
+    return GeoPoint(
+            longitude: longitude - delta.longitude,
+            latitude: latitude - delta.latitude)
+        .normalize();
   }
 
 //   /// Calculate great circle distance from this to the other
@@ -195,20 +187,20 @@ latitude:
   /// Like Distance(), but use a simplified faster formula that may be
   /// less accurate.
 
-  double distanceS( GeoPoint other) {
-  double distance;
-  distanceBearingS(this, other, &distance, nullptr);
-  return distance;
-}
+//   double distanceS( GeoPoint other) {
+//   double distance;
+//   distanceBearingS(this, other, &distance, nullptr);
+//   return distance;
+// }
 
   /// Like Bearing(), but use a simplified faster formula that may be
   /// less accurate.
 
-  Angle bearingS( GeoPoint other) {
-  Angle angle;
-  distanceBearingS(this, other, (Angle *)nullptr, &angle);
-  return angle;
-}
+//   Angle bearingS( GeoPoint other) {
+
+//   return distanceBearingS(this, other );
+
+// }
 
   /// Like DistanceBearing(), but use a simplified faster formula that
   /// may be less accurate.
@@ -227,10 +219,10 @@ latitude:
   ///
   /// @return Distance (m) along from-to line
 
-  double projectedDistance( GeoPoint from,
-                            GeoPoint to) {
-  return projectedDistance(from, to, this);
-}
+//   double projectedDistance( GeoPoint from,
+//                             GeoPoint to) {
+//   return projectedDistance(from, to, this);
+// }
 
   /// Find point a set distance along a great-circle path towards
   /// a destination
@@ -240,18 +232,17 @@ latitude:
   ///
   /// @return Location of point
 
-  GeoPoint intermediatePoint( GeoPoint destination,
-                             double distance) {
-  return intermediatePoint(this, destination, distance);
-}
+//   GeoPoint intermediatePoint( GeoPoint destination,
+//                              double distance) {
+//   return intermediatePoint(this, destination, distance);
+// }
 
   /// Find the nearest great-circle middle point between this point and
   /// the specified one.
 
-  GeoPoint middle( GeoPoint other) {
-  return middle(this, other);
-}
-
+//   GeoPoint middle( GeoPoint other) {
+//   return middle(this, other);
+// }
 
   //  bool operator==(const GeoPoint &) const  = default;
   //  bool operator!=(const GeoPoint &) const  = default;
@@ -260,14 +251,14 @@ latitude:
 //static_assert(std::is_trivial<GeoPoint>::value, "type is not trivial");
 
 /// Extension of GeoPoint for altitude (3d location in spherical space)
-class AGeoPoint extends GeoPoint {
-  /// < Nav reference altitude (m)
-  double altitude;
+// class AGeoPoint extends GeoPoint {
+//   /// < Nav reference altitude (m)
+//   double altitude;
 
-  AGeoPoint._() ;
+//   AGeoPoint._() ;
 
-   AGeoPoint(GeoPoint p, double alt) 
-    :base(p), altitude(alt) ;
-}
+//    AGeoPoint(GeoPoint p, double alt)
+//     :base(p, altitude(alt)) ;
+// }
 
 // static_assert(std::is_trivial<AGeoPoint>::value, "type is not trivial");

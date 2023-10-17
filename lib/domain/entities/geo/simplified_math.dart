@@ -101,7 +101,7 @@ findLatitudeLongitudeS(GeoPoint loc,
                                  + cosLatitude * sinDistance * cosBearing);
 
   Angle locOutLongitude = loc.longitude +
-    Angle.fromXY(cosDistance - sinLatitude * locOutLatitude.latitude.sin(),
+    Angle.fromXY(cosDistance - sinLatitude * locOutLatitude.sin(),
                   sinBearing * sinDistance * cosLatitude);
 
   return GeoPoint(latitude: locOutLatitude, longitude: locOutLongitude).normalize();// ensure longitude is within -180:180
