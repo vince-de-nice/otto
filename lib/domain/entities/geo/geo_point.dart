@@ -94,7 +94,6 @@ class GeoPoint with _$GeoPoint {
   /// @param t Parametric distance along delta to add [0,1]
   ///
   /// @return Location of point
-
   GeoPoint parametric(GeoPoint delta, double t) {
     return this + delta * t;
   }
@@ -105,7 +104,6 @@ class GeoPoint with _$GeoPoint {
   /// @param t Parametric distance along this to end [0,1]
   ///
   /// @return Location of point
-
   GeoPoint interpolate(GeoPoint end, double t) {
     return (this) + (end - (this)) * t;
   }
@@ -115,7 +113,6 @@ class GeoPoint with _$GeoPoint {
   /// @param x Factor to magnify
   ///
   /// @return Modified point
-
   GeoPoint operator *(double x) {
     return GeoPoint(longitude: longitude * x, latitude: latitude * x);
   }
@@ -125,7 +122,6 @@ class GeoPoint with _$GeoPoint {
   /// @param delta Delta to add
   ///
   /// @return Modified point
-
   GeoPoint operator +(GeoPoint delta) {
     return GeoPoint(
         longitude: longitude + delta.longitude,
