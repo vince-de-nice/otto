@@ -7,6 +7,8 @@
 // #include "time/BrokenTime.hpp"
 
  import 'package:otto/domain/entities/geo/geo_point.dart';
+import 'package:otto/domain/entities/time/broken_time.dart';
+import 'package:otto/domain/entities/units/unit.dart';
 
 NMEAInfo nMEAInfo;
 
@@ -17,9 +19,9 @@ class IGCFix
 
   GeoPoint location;
 
-  bool gps_valid;
+  bool gpsValid;
 
-  int gps_altitude, pressure_altitude;
+  int gpsAltitude, pressureAltitude;
 
   /* extensions follow */
 
@@ -77,66 +79,66 @@ class IGCFix
   //   ClearExtensions();
   // }
 
-   bool IsDefined()   {
-    return time.IsPlausible();
+   bool isDefined()   {
+    return time.isPlausible();
   }
 
   /// Copy data from the #NMEAInfo object into this.
   ///
   /// @return true if this object is a valid new fix
-  bool Apply(const NMEAInfo &basic) {
-  if (!basic.time_available) {
+  bool apply(const NMEAInfo &basic) {
+  if (!basic.timeAvailable) {
     return false;
   }
 
-  if (!IsDefined() && !basic.location_available) {
+  if (!IsDefined() && !basic.locationAvailable) {
     return false;
   }
 
   /* "Use A for a 3D fix and V for a 2D fix (no GPS altitude) or for
      no GPS data" */
-  gps_valid = basic.location_available && basic.gps_altitude_available;
+  gpsValid = basic.locationAvailable && basic.gpsAltitudeAvailable;
 
-  if (basic.location_available)
+  if (basic.locationAvailable)
     location = basic.location;
 
-  time = basic.date_time_utc;
+  time = basic.dateTimeUtc;
 
-  gps_altitude = basic.gps_altitude_available
-    ? (int)basic.gps_altitude
+  gpsAltitude = basic.gpsAltitudeAvailable
+    ? (int)basic.gpsAltitude
     : 0;
 
-  pressure_altitude = basic.pressure_altitude_available
-    ? (int)basic.pressure_altitude
-    : (basic.baro_altitude_available
+  pressureAltitude = basic.pressureAltitudeAvailable
+    ? (int)basic.pressureAltitude
+    : (basic.baroAltitudeAvailable
        /* if there's only baro altitude and no QNH, assume baro
           altitude is good enough */
-       ? (int)basic.baro_altitude
+       ? (int)basic.baroAltitude
        /* if all else fails, fall back to GPS altitude, to avoid
           application bugs (SeeYou is known for display errors) */
-       : gps_altitude);
+       : gpsAltitude);
 
-  ClearExtensions();
+  clearExtensions();
 
-  enl = basic.engine_noise_level_available
-    ? (int?) basic.engine_noise_level
+  enl = basic.engineNoiseLevelAvailable
+    ? (int?) basic.engineNoiseLevel
     : null;
 
-  trt = basic.track_available
+  trt = basic.trackAvailable
     ? (int?) basic.track.Degrees()
     : null;
 
-  gsp = basic.ground_speed_available
-    ? (int?) Units::ToUserUnit(basic.ground_speed, Unit::KILOMETER_PER_HOUR)
+  gsp = basic.groundSpeedAvailable
+    ? (int?) Units.toUserUnit(basic.groundSpeed, Unit.kilometerPerHour)
     : null;
 
-  if (basic.airspeed_available) {
-    ias = (int?) Units::ToUserUnit(basic.indicated_airspeed, Unit::KILOMETER_PER_HOUR);
-    tas = (int?) Units::ToUserUnit(basic.true_airspeed, Unit::KILOMETER_PER_HOUR);
+  if (basic.airspeedAvailable) {
+    ias = (int?) Units.toUserUnit(basic.indicatedAirspeed, Unit.kilometerPerHour);
+    tas = (int?) Units.toUserUnit(basic.trueAirspeed, Unit.kilometerPerHour);
   }
 
-  siu = basic.gps.satellites_used_available
-    ? (int?) basic.gps.satellites_used
+  siu = basic.gps.satellitesUsedAvailable
+    ? (int?) basic.gps.satellitesUsed
     : null;
 
   return true;
