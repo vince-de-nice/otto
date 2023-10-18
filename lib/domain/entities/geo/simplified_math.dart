@@ -31,7 +31,7 @@ earthDistance( double a)
 /// @param Distance Pointer to the distance variable
 /// @param Bearing Pointer to the bearing variable
 
-(Angle distanceAngle, Angle bearing) distanceBearingS(GeoPoint loc1, GeoPoint loc2   ) {
+(Angle distanceAngle, Angle bearing) distanceAngleBearingS(GeoPoint loc1, GeoPoint loc2   ) {
   assert(loc1.isValid());
   assert(loc2.isValid());
 
@@ -41,7 +41,7 @@ earthDistance( double a)
 
 
 
-  const Angle dlon = loc2.longitude - loc1.longitude;
+  final Angle dlon = loc2.longitude - loc1.longitude;
 
 
     final s1 = (loc2.latitude - loc1.latitude).accurateHalfSin();
@@ -68,10 +68,10 @@ earthDistance( double a)
   }
 
 
-Angle distanceBearingS(GeoPoint loc1, GeoPoint loc2,   Angle bearing) {
+(double distance, Angle bearing) distanceBearingS(GeoPoint loc1, GeoPoint loc2,   ) {
 
-   final Angle distanceAngle =  distanceBearingS(loc1, loc2, bearing);
-    return angleToEarthDistance(distanceAngle);
+   final (Angle distanceAngle,Angle bearing) =  distanceAngleBearingS(loc1, loc2);
+    return (angleToEarthDistance(distanceAngle),bearing);
 }
 
 /// @see FindLatitudeLongitude()
@@ -112,7 +112,7 @@ findLatitudeLongitudeS(GeoPoint loc,
 double
 projectedDistanceS(GeoPoint loc1, GeoPoint loc2, GeoPoint loc3) {
   
- final (Angle distAd, Angle crsAd) = distanceBearingS(loc1, loc3);
+ final (Angle distAd, Angle crsAd) = distanceAngleBearingS(loc1, loc3);
   if (!distAd.isPositive()){
     /* workaround: new sine implementation may return small non-zero
        values for sin(0) */
@@ -120,7 +120,7 @@ projectedDistanceS(GeoPoint loc1, GeoPoint loc2, GeoPoint loc3) {
   }
 
  final  (Angle distAb, Angle crsAb)=
-  distanceBearingS(loc1, loc2);
+  distanceAngleBearingS(loc1, loc2);
   if (!distAb.isPositive()){
     /* workaround: new sine implementation may return small non-zero
        values for sin(0) */
