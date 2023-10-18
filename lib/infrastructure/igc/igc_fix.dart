@@ -3,12 +3,15 @@
 
 
 
-#include "Geo/GeoPoint.hpp"
-#include "time/BrokenTime.hpp"
+// #include "Geo/GeoPoint.hpp"
+// #include "time/BrokenTime.hpp"
 
-struct NMEAInfo;
+ import 'package:otto/domain/entities/geo/geo_point.dart';
 
-struct IGCFix
+NMEAInfo nMEAInfo;
+
+
+class IGCFix
 {
   BrokenTime time;
 
@@ -20,84 +23,75 @@ struct IGCFix
 
   /* extensions follow */
 
-  /**
-   * Engine noise level [0 to 999].  Negative if undefined.
-   */
-  int16_t enl;
+  /// Engine noise level [0 to 999].  null if undefined.
+  int? enl;
 
-  /**
-   * Forward thrust, e.g. engine rpm [0 to 999].  Negative if
-   * undefined.
-   */
-  int16_t rpm;
+  /// Forward thrust, e.g. engine rpm [0 to 999].  Negative if
+  /// undefined.
+  int? rpm;
 
-  /**
-   * Magnetic heading [degrees].  Negative if undefined.
-   */
-  int16_t hdm;
+  /// Magnetic heading [degrees].  null if undefined.
+  int? hdm;
 
-  /**
-   * True heading [degrees].  Negative if undefined.
-   */
-  int16_t hdt;
+  /// True heading [degrees].  null if undefined.
+  int? hdt;
 
-  /**
-   * Magnetic track [degrees].  Negative if undefined.
-   */
-  int16_t trm;
+  /// Magnetic track [degrees].  null if undefined.
+  int? trm;
 
-  /**
-   * True track [degrees].  Negative if undefined.
-   */
-  int16_t trt;
+  /// True track [degrees].  null if undefined.
+  int? trt;
 
-  /**
-   * Ground speed [km/h].  Negative if undefined.
-   */
-  int16_t gsp;
+  /// Ground speed [km/h].  null if undefined.
+  int? gsp;
 
-  /**
-   * Indicated airspeed [km/h].  Negative if undefined.
-   */
-  int16_t ias;
+  /// Indicated airspeed [km/h].  null if undefined.
+  int? ias;
 
-  /**
-   * True airspeed [km/h].  Negative if undefined.
-   */
-  int16_t tas;
+  /// True airspeed [km/h].  null if undefined.
+  int? tas;
 
-  /**
-   * Satellites in use.  Negative if undefined.
-   */
-  int16_t siu;
+  /// Satellites in use.  null if undefined.
+  int? siu;
 
-   void ClearExtensions() noexcept {
-    enl = rpm = -1;
-    hdm = hdt = trm = trt = -1;
-    gsp = ias = tas = -1;
-    siu = -1;
+   void clearExtensions()  {
+    enl = rpm = null;
+    hdm = hdt = trm = trt = null;
+    gsp = ias = tas = null;
+    siu = null;
   }
 
-   void Clear() noexcept {
-    time = BrokenTime::Invalid();
-    ClearExtensions();
-  }
+  //  void class namePainter extends CustomPainter {
+   
+  //    @override
+  //    void paint(Canvas canvas, Size size) {
+  //    }
+   
+  //    @override
+  //    bool shouldRepaint(namePainter oldDelegate) => false;
+   
+  //    @override
+  //    bool shouldRebuildSemantics(namePainter oldDelegate) => false;
+  //  }lear()  {
+  //   time = BrokenTime::Invalid();
+  //   ClearExtensions();
+  // }
 
-   bool IsDefined() const noexcept {
+   bool IsDefined()   {
     return time.IsPlausible();
   }
 
-  /**
-   * Copy data from the #NMEAInfo object into this.
-   *
-   * @return true if this object is a valid new fix
-   */
+  /// Copy data from the #NMEAInfo object into this.
+  ///
+  /// @return true if this object is a valid new fix
   bool Apply(const NMEAInfo &basic) {
-  if (!basic.time_available)
+  if (!basic.time_available) {
     return false;
+  }
 
-  if (!IsDefined() && !basic.location_available)
+  if (!IsDefined() && !basic.location_available) {
     return false;
+  }
 
   /* "Use A for a 3D fix and V for a 2D fix (no GPS altitude) or for
      no GPS data" */
@@ -125,25 +119,25 @@ struct IGCFix
   ClearExtensions();
 
   enl = basic.engine_noise_level_available
-    ? (int16_t) basic.engine_noise_level
-    : -1;
+    ? (int?) basic.engine_noise_level
+    : null;
 
   trt = basic.track_available
-    ? (int16_t) basic.track.Degrees()
-    : -1;
+    ? (int?) basic.track.Degrees()
+    : null;
 
   gsp = basic.ground_speed_available
-    ? (int16_t) Units::ToUserUnit(basic.ground_speed, Unit::KILOMETER_PER_HOUR)
-    : -1;
+    ? (int?) Units::ToUserUnit(basic.ground_speed, Unit::KILOMETER_PER_HOUR)
+    : null;
 
   if (basic.airspeed_available) {
-    ias = (int16_t) Units::ToUserUnit(basic.indicated_airspeed, Unit::KILOMETER_PER_HOUR);
-    tas = (int16_t) Units::ToUserUnit(basic.true_airspeed, Unit::KILOMETER_PER_HOUR);
+    ias = (int?) Units::ToUserUnit(basic.indicated_airspeed, Unit::KILOMETER_PER_HOUR);
+    tas = (int?) Units::ToUserUnit(basic.true_airspeed, Unit::KILOMETER_PER_HOUR);
   }
 
   siu = basic.gps.satellites_used_available
-    ? (int16_t) basic.gps.satellites_used
-    : -1;
+    ? (int?) basic.gps.satellites_used
+    : null;
 
   return true;
 }

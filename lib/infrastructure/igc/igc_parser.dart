@@ -1,27 +1,26 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 // Copyright The XCSoar Project
 
-#pragma once
-
-struct IGCFix;
-struct IGCHeader;
-struct IGCExtensions;
-struct IGCDeclarationHeader;
-struct IGCDeclarationTurnpoint;
-struct BrokenDate;
-struct BrokenTime;
-struct GeoPoint;
+#import 'package:otto/domain/entities/geo/geo_point.dart';
+import 'package:otto/infrastructure/igc/igc_declaration.dart';
+import 'package:otto/infrastructure/igc/igc_header.dart';
 
 
-using std::string_view_literals::operator""sv;
-/**
- * Character table for base-36.
- */
-static constexpr char c36[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+IGCFix? iGCFix;
+IGCHeader? iGCHeader;
+IGCExtensions? iGCExtensions;
+IGCDeclarationHeader? iGCDeclarationHeader;
+IGCDeclarationTurnpoint? iGCDeclarationTurnpoint;
+BrokenDate? brokenDate;
+BrokenTime? brokenTime;
+GeoPoint? geoPoint;
 
-/**
- * Convert a 5 digit logger serial to a 3 letter logger id.
- */
+
+// using std::string_view_literals::operator""sv;
+/// Character table for base-36.
+const String c36 = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+/// Convert a 5 digit logger serial to a 3 letter logger id.
 static void
 ImportDeprecatedLoggerSerial(char id[4], unsigned serial)
 {
@@ -31,25 +30,25 @@ ImportDeprecatedLoggerSerial(char id[4], unsigned serial)
   id[3] = 0;
 }
 
-/**
- * Parse an IGC "A" record.
- *
- * @return true on success, false if the line was not recognized
- */
+/// Parse an IGC "A" record.
+///
+/// @return true on success, false if the line was not recognized
 bool
-IGCParseHeader(const char *line, IGCHeader &header)bool
-IGCParseHeader(const char *line, IGCHeader &header)
+IGCParseHeader(String line, IGCHeader &header)bool
+
 {
   /* sample from CAI302: "ACAM3OV" */
   /* sample from Colibri: "ALXN13103FLIGHT:1" */
 
-  if (line[0] != 'A')
+  if (line[0] != 'A') {
     return false;
+  }
 
   ++line;
   size_t length = strlen(line);
-  if (length < 6)
+  if (length < 6) {
     return false;
+  }
 
   memcpy(header.manufacturer, line, 3);
   header.manufacturer[3] = 0;
@@ -67,7 +66,7 @@ IGCParseHeader(const char *line, IGCHeader &header)
     line += 3;
   }
 
-  const char *colon = strchr(line, ':');
+  String colon = strchr(line, ':');
   header.flight = colon != NULL
     ? strtoul(colon + 1, NULL, 10)
     : 0;
@@ -75,16 +74,15 @@ IGCParseHeader(const char *line, IGCHeader &header)
   return true;
 }
 
-/**
- * Parse an IGC "HFDTE" record.
- *
- * @return true on success, false if the line was not recognized
- */
+/// Parse an IGC "HFDTE" record.
+///
+/// @return true on success, false if the line was not recognized
 bool
-IGCParseDateRecord(const char *line, BrokenDate &date){
+IGCParseDateRecord(String line, BrokenDate &date){
   line = StringAfterPrefix(line, "HFDTE");
-  if (line == nullptr)
+  if (line == nullptr) {
     return false;
+  }
 
   if (auto date = StringAfterPrefix(line, "DATE"sv))
     line = date;
@@ -95,8 +93,9 @@ IGCParseDateRecord(const char *line, BrokenDate &date){
 
   char *endptr;
   unsigned long value = strtoul(line, &endptr, 10);
-  if (endptr != line + 6)
+  if (endptr != line + 6) {
     return false;
+  }
 
   date.year = 1990 + (value + 10) % 100; /* Y2090 bug! */
   date.month = (value / 100) % 100;
@@ -107,36 +106,37 @@ IGCParseDateRecord(const char *line, BrokenDate &date){
 
 
 static int
-ParseTwoDigits(const char *p)
+ParseTwoDigits(String p)
 {
-  if (!IsDigitASCII(p[0]) || !IsDigitASCII(p[1]))
+  if (!IsDigitASCII(p[0]) || !IsDigitASCII(p[1])) {
     return -1;
+  }
 
   return (p[0] - '0') * 10 + (p[1] - '0');
 }
 
 static bool
-CheckThreeAlphaNumeric(const char *src)
+CheckThreeAlphaNumeric(String src)
 {
   return IsAlphaNumericASCII(src[0]) && IsAlphaNumericASCII(src[1]) &&
     IsAlphaNumericASCII(src[2]);
 }
 
-/**
- * Parse an IGC "I" record.
- *
- * @return true on success, false if the line was not recognized
- */
+/// Parse an IGC "I" record.
+///
+/// @return true on success, false if the line was not recognized
 bool
-IGCParseExtensions(const char *buffer, IGCExtensions &extensions)bool
-IGCParseExtensions(const char *buffer, IGCExtensions &extensions)
+IGCParseExtensions(String buffer, IGCExtensions &extensions)bool
+
 {
-  if (*buffer++ != 'I')
+  if (*buffer++ != 'I') {
     return false;
+  }
 
   int count = ParseTwoDigits(buffer);
-  if (count < 0)
+  if (count < 0) {
     return false;
+  }
 
   buffer += 2;
 
@@ -144,22 +144,25 @@ IGCParseExtensions(const char *buffer, IGCExtensions &extensions)
 
   while (count-- > 0) {
     const int start = ParseTwoDigits(buffer);
-    if (start < 8)
+    if (start < 8) {
       return false;
+    }
 
     buffer += 2;
 
     const int finish = ParseTwoDigits(buffer);
-    if (finish < start)
+    if (finish < start) {
       return false;
+    }
 
     buffer += 2;
 
     if (!CheckThreeAlphaNumeric(buffer))
       return false;
 
-    if (extensions.full())
+    if (extensions.full()) {
       return false;
+    }
 
     IGCExtension &x = extensions.append();
     x.start = start;
@@ -173,22 +176,21 @@ IGCParseExtensions(const char *buffer, IGCExtensions &extensions)
   return true;
 }
 
-/**
- * Parse an unsigned integer from the given string range
- * (null-termination is not necessary).
- *
- * @param p the string
- * @param end the end of the string
- * @return the result, or -1 on error
- */
+/// Parse an unsigned integer from the given string range
+/// (null-termination is not necessary).
+///
+/// @param p the string
+/// @param end the end of the string
+/// @return the result, or -1 on error
 static int
-ParseUnsigned(const char *p, const char *end)
+ParseUnsigned(String p, String end)
 {
   unsigned value = 0;
 
   for (; p < end; ++p) {
-    if (!IsDigitASCII(*p))
+    if (!IsDigitASCII(*p)) {
       return -1;
+    }
 
     value = value * 10 + (*p - '0');
   }
@@ -197,103 +199,109 @@ ParseUnsigned(const char *p, const char *end)
 }
 
 static void
-ParseExtensionValue(const char *p, const char *end, int16_t &value_r)
+ParseExtensionValue(String p, String end, int16_t &value_r)
 {
   int value = ParseUnsigned(p, end);
-  if (value >= 0)
+  if (value >= 0) {
     value_r = value;
+  }
 }
 
 
 
-/**
- * Parse the first #n characters from the input string.  If the string
- * is not long enough, nothing is parsed.  This is used to account for
- * columns that are longer than specified; according to LXNav, this is
- * used for decimal places (which are ignored by this function).
- */
+/// Parse the first #n characters from the input string.  If the string
+/// is not long enough, nothing is parsed.  This is used to account for
+/// columns that are longer than specified; according to LXNav, this is
+/// used for decimal places (which are ignored by this function).
 static void
-ParseExtensionValueN(const char *p, const char *end, size_t n,
+ParseExtensionValueN(String p, String end, size_t n,
                      int16_t &value_r)
 {
-  if (n > (size_t)(p - end))
+  if (n > (size_t)(p - end)) {
     /* string is too short */
     return;
+  }
 
   int value = ParseUnsigned(p, p + n);
-  if (value >= 0)
+  if (value >= 0) {
     value_r = value;
+  }
 }
 
-/**
- * Parse a location in IGC file format. (DDMMmmm[N/S]DDDMMmmm[E/W])
- *
- * @return true on success, false if the location was not recognized
- */
+/// Parse a location in IGC file format. (DDMMmmm[N/S]DDDMMmmm[E/W])
+///
+/// @return true on success, false if the location was not recognized
 bool
-IGCParseLocation(const char *buffer, GeoPoint &location){
+IGCParseLocation(String buffer, GeoPoint &location){
   unsigned lat_degrees, lat_minutes, lon_degrees, lon_minutes;
   char lat_char, lon_char;
 
   if (sscanf(buffer, "%02u%05u%c%03u%05u%c",
              &lat_degrees, &lat_minutes, &lat_char,
-             &lon_degrees, &lon_minutes, &lon_char) != 6)
+             &lon_degrees, &lon_minutes, &lon_char) != 6) {
     return false;
+  }
 
   if (lat_degrees >= 90 || lat_minutes >= 60000 ||
-      (lat_char != 'N' && lat_char != 'S'))
+      (lat_char != 'N' && lat_char != 'S')) {
     return false;
+  }
 
   if (lon_degrees >= 180 || lon_minutes >= 60000 ||
-      (lon_char != 'E' && lon_char != 'W'))
+      (lon_char != 'E' && lon_char != 'W')) {
     return false;
+  }
 
   location.latitude = Angle::Degrees(lat_degrees +
                                      lat_minutes / 60000.);
-  if (lat_char == 'S')
+  if (lat_char == 'S') {
     location.latitude.Flip();
+  }
 
   location.longitude = Angle::Degrees(lon_degrees +
                                       lon_minutes / 60000.);
-  if (lon_char == 'W')
+  if (lon_char == 'W') {
     location.longitude.Flip();
+  }
 
   return true;
 }
 
-/**
- * Parse an IGC "B" record.
- *
- * @return true on success, false if the line was not recognized
- */
+/// Parse an IGC "B" record.
+///
+/// @return true on success, false if the line was not recognized
 bool
-IGCParseFix(const char *buffer, const IGCExtensions &extensions, IGCFix &fix){
-  if (*buffer != 'B')
+IGCParseFix(String buffer, const IGCExtensions &extensions, IGCFix &fix){
+  if (*buffer != 'B') {
     return false;
+  }
 
   BrokenTime time;
-  if (!IGCParseTime(buffer + 1, time))
+  if (!IGCParseTime(buffer + 1, time)) {
     return false;
+  }
 
   char valid_char;
   int gps_altitude, pressure_altitude;
 
   if (sscanf(buffer + 24, "%c%05d%05d",
-             &valid_char, &pressure_altitude, &gps_altitude) != 3)
+             &valid_char, &pressure_altitude, &gps_altitude) != 3) {
     return false;
+  }
 
-  if (valid_char == 'A')
+  if (valid_char == 'A') {
     fix.gps_valid = true;
-  else if (valid_char == 'V')
+  } else if (valid_char == 'V'){
     fix.gps_valid = false;
-  else
+   } else {
     return false;
-
+   }
   fix.gps_altitude = gps_altitude;
   fix.pressure_altitude = pressure_altitude;
 
-  if (!IGCParseLocation(buffer + 7, fix.location))
+  if (!IGCParseLocation(buffer + 7, fix.location)) {
     return false;
+  }
 
   fix.time = time;
 
@@ -305,12 +313,13 @@ IGCParseFix(const char *buffer, const IGCExtensions &extensions, IGCFix &fix){
     assert(extension.start > 0);
     assert(extension.finish >= extension.start);
 
-    if (extension.finish > line_length)
+    if (extension.finish > line_length) {
       /* exceeds the input line length */
       continue;
+    }
 
-    const char *start = buffer + extension.start - 1;
-    const char *finish = buffer + extension.finish;
+    String start = buffer + extension.start - 1;
+    String finish = buffer + extension.finish;
 
     if (StringIsEqual(extension.code, "ENL"))
       ParseExtensionValue(start, finish, fix.enl);
@@ -337,56 +346,59 @@ IGCParseFix(const char *buffer, const IGCExtensions &extensions, IGCFix &fix){
   return true;
 }
 
-/**
- * Parse a time in IGC file format (HHMMSS).
- *
- * @return true on success, false if the time was not recognized
- */
+/// Parse a time in IGC file format (HHMMSS).
+///
+/// @return true on success, false if the time was not recognized
 bool
-IGCParseTime(const char *buffer, BrokenTime &time){
+IGCParseTime(String buffer, BrokenTime &time){
   unsigned hour, minute, second;
 
-  if (sscanf(buffer, "%02u%02u%02u", &hour, &minute, &second) != 3)
+  if (sscanf(buffer, "%02u%02u%02u", &hour, &minute, &second) != 3) {
     return false;
+  }
 
   time = BrokenTime(hour, minute, second);
   return time.IsPlausible();
 }
 
 static bool
-IGCParseDate(const char *buffer, BrokenDate &date)
+IGCParseDate(String buffer, BrokenDate &date)
 {
   unsigned day, month, year;
 
-  if (sscanf(buffer, "%02u%02u%02u", &day, &month, &year) != 3)
+  if (sscanf(buffer, "%02u%02u%02u", &day, &month, &year) != 3) {
     return false;
+  }
 
   date = BrokenDate(year + 2000, month, day);
   return date.IsPlausible();
 }
 
-/**
- * Parse an IGC "C" header record.
- *
- * @return true on success, false if the line was not recognized
- */
+/// Parse an IGC "C" header record.
+///
+/// @return true on success, false if the line was not recognized
 bool
-IGCParseDeclarationHeader(const char *line, IGCDeclarationHeader &header){
-  if (*line != 'C' || strlen(line) < 25)
+IGCParseDeclarationHeader(String line, IGCDeclarationHeader &header){
+  if (*line != 'C' || strlen(line) < 25) {
     return false;
+  }
 
-  if (!IGCParseDate(line + 1, header.datetime))
+  if (!IGCParseDate(line + 1, header.datetime)) {
     return false;
+  }
 
-  if (!IGCParseTime(line + 7, header.datetime))
+  if (!IGCParseTime(line + 7, header.datetime)) {
     return false;
+  }
 
-  if (!IGCParseDate(line + 13, header.flight_date))
+  if (!IGCParseDate(line + 13, header.flight_date)) {
     header.flight_date.Clear();
+  }
 
   if (!sscanf(line + 23, "%02u", &header.num_turnpoints) ||
-      header.num_turnpoints > 99)
+      header.num_turnpoints > 99) {
     return false;
+  }
 
   std::copy(line + 19, line + 23, header.task_id);
 
@@ -394,18 +406,18 @@ IGCParseDeclarationHeader(const char *line, IGCDeclarationHeader &header){
   return true;
 }
 
-/**
- * Parse an IGC "C" turnpoint record.
- *
- * @return true on success, false if the line was not recognized
- */
+/// Parse an IGC "C" turnpoint record.
+///
+/// @return true on success, false if the line was not recognized
 bool
-IGCParseDeclarationTurnpoint(const char *line, IGCDeclarationTurnpoint &tp){
-  if (*line != 'C' || strlen(line) < 18)
+IGCParseDeclarationTurnpoint(String line, IGCDeclarationTurnpoint &tp){
+  if (*line != 'C' || strlen(line) < 18) {
     return false;
+  }
 
-  if (!IGCParseLocation(line + 1, tp.location))
+  if (!IGCParseLocation(line + 1, tp.location)) {
     return false;
+  }
 
   tp.name = line + 18;
   return true;
