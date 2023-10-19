@@ -19,68 +19,35 @@ mixin _$UnitSetting {
   /// Unit for distances
   Unit get distanceUnit => throw _privateConstructorUsedError;
 
-  /// Unit for distances
-  set distanceUnit(Unit value) => throw _privateConstructorUsedError;
-
   /// Unit for altitudes, heights
   Unit get altitudeUnit => throw _privateConstructorUsedError;
-
-  /// Unit for altitudes, heights
-  set altitudeUnit(Unit value) => throw _privateConstructorUsedError;
 
   /// Unit for temperature
   Unit get temperatureUnit => throw _privateConstructorUsedError;
 
-  /// Unit for temperature
-  set temperatureUnit(Unit value) => throw _privateConstructorUsedError;
-
   /// Unit for aircraft speeds
   Unit get speedUnit => throw _privateConstructorUsedError;
-
-  /// Unit for aircraft speeds
-  set speedUnit(Unit value) => throw _privateConstructorUsedError;
 
   /// Unit for vertical speeds, varios
   Unit get verticalSpeedUnit => throw _privateConstructorUsedError;
 
-  /// Unit for vertical speeds, varios
-  set verticalSpeedUnit(Unit value) => throw _privateConstructorUsedError;
-
   /// Unit for wind speeds
   Unit get windSpeedUnit => throw _privateConstructorUsedError;
-
-  /// Unit for wind speeds
-  set windSpeedUnit(Unit value) => throw _privateConstructorUsedError;
 
   /// Unit for task speeds
   Unit get taskSpeedUnit => throw _privateConstructorUsedError;
 
-  /// Unit for task speeds
-  set taskSpeedUnit(Unit value) => throw _privateConstructorUsedError;
-
   /// Unit for pressures
   Unit get pressureUnit => throw _privateConstructorUsedError;
-
-  /// Unit for pressures
-  set pressureUnit(Unit value) => throw _privateConstructorUsedError;
 
   /// Unit for wing loading
   Unit get wingLoadingUnit => throw _privateConstructorUsedError;
 
-  /// Unit for wing loading
-  set wingLoadingUnit(Unit value) => throw _privateConstructorUsedError;
-
   /// Unit for mass
   Unit get massUnit => throw _privateConstructorUsedError;
 
-  /// Unit for mass
-  set massUnit(Unit value) => throw _privateConstructorUsedError;
-
   /// Unit for rotation speed
   Unit get rotationUnit => throw _privateConstructorUsedError;
-
-  /// Unit for rotation speed
-  set rotationUnit(Unit value) => throw _privateConstructorUsedError;
 
   @JsonKey(ignore: true)
   $UnitSettingCopyWith<UnitSetting> get copyWith =>
@@ -279,67 +246,122 @@ class __$$UnitSettingImplCopyWithImpl<$Res>
 
 class _$UnitSettingImpl extends _UnitSetting {
   const _$UnitSettingImpl(
-      {required this.distanceUnit,
-      required this.altitudeUnit,
-      required this.temperatureUnit,
-      required this.speedUnit,
-      required this.verticalSpeedUnit,
-      required this.windSpeedUnit,
-      required this.taskSpeedUnit,
-      required this.pressureUnit,
-      required this.wingLoadingUnit,
-      required this.massUnit,
-      required this.rotationUnit})
+      {this.distanceUnit = Unit.kilometer,
+      this.altitudeUnit = Unit.meter,
+      this.temperatureUnit = Unit.degreesCelcius,
+      this.speedUnit = Unit.kilometerPerHour,
+      this.verticalSpeedUnit = Unit.meterPerSecond,
+      this.windSpeedUnit = Unit.kilometerPerHour,
+      this.taskSpeedUnit = Unit.kilometerPerHour,
+      this.pressureUnit = Unit.hectopascal,
+      this.wingLoadingUnit = Unit.kgPerM2,
+      this.massUnit = Unit.kg,
+      this.rotationUnit = Unit.rpm})
       : super._();
 
   /// Unit for distances
   @override
-  Unit distanceUnit;
+  @JsonKey()
+  final Unit distanceUnit;
 
   /// Unit for altitudes, heights
   @override
-  Unit altitudeUnit;
+  @JsonKey()
+  final Unit altitudeUnit;
 
   /// Unit for temperature
   @override
-  Unit temperatureUnit;
+  @JsonKey()
+  final Unit temperatureUnit;
 
   /// Unit for aircraft speeds
   @override
-  Unit speedUnit;
+  @JsonKey()
+  final Unit speedUnit;
 
   /// Unit for vertical speeds, varios
   @override
-  Unit verticalSpeedUnit;
+  @JsonKey()
+  final Unit verticalSpeedUnit;
 
   /// Unit for wind speeds
   @override
-  Unit windSpeedUnit;
+  @JsonKey()
+  final Unit windSpeedUnit;
 
   /// Unit for task speeds
   @override
-  Unit taskSpeedUnit;
+  @JsonKey()
+  final Unit taskSpeedUnit;
 
   /// Unit for pressures
   @override
-  Unit pressureUnit;
+  @JsonKey()
+  final Unit pressureUnit;
 
   /// Unit for wing loading
   @override
-  Unit wingLoadingUnit;
+  @JsonKey()
+  final Unit wingLoadingUnit;
 
   /// Unit for mass
   @override
-  Unit massUnit;
+  @JsonKey()
+  final Unit massUnit;
 
   /// Unit for rotation speed
   @override
-  Unit rotationUnit;
+  @JsonKey()
+  final Unit rotationUnit;
 
   @override
   String toString() {
     return 'UnitSetting(distanceUnit: $distanceUnit, altitudeUnit: $altitudeUnit, temperatureUnit: $temperatureUnit, speedUnit: $speedUnit, verticalSpeedUnit: $verticalSpeedUnit, windSpeedUnit: $windSpeedUnit, taskSpeedUnit: $taskSpeedUnit, pressureUnit: $pressureUnit, wingLoadingUnit: $wingLoadingUnit, massUnit: $massUnit, rotationUnit: $rotationUnit)';
   }
+
+  @override
+  bool operator ==(dynamic other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$UnitSettingImpl &&
+            (identical(other.distanceUnit, distanceUnit) ||
+                other.distanceUnit == distanceUnit) &&
+            (identical(other.altitudeUnit, altitudeUnit) ||
+                other.altitudeUnit == altitudeUnit) &&
+            (identical(other.temperatureUnit, temperatureUnit) ||
+                other.temperatureUnit == temperatureUnit) &&
+            (identical(other.speedUnit, speedUnit) ||
+                other.speedUnit == speedUnit) &&
+            (identical(other.verticalSpeedUnit, verticalSpeedUnit) ||
+                other.verticalSpeedUnit == verticalSpeedUnit) &&
+            (identical(other.windSpeedUnit, windSpeedUnit) ||
+                other.windSpeedUnit == windSpeedUnit) &&
+            (identical(other.taskSpeedUnit, taskSpeedUnit) ||
+                other.taskSpeedUnit == taskSpeedUnit) &&
+            (identical(other.pressureUnit, pressureUnit) ||
+                other.pressureUnit == pressureUnit) &&
+            (identical(other.wingLoadingUnit, wingLoadingUnit) ||
+                other.wingLoadingUnit == wingLoadingUnit) &&
+            (identical(other.massUnit, massUnit) ||
+                other.massUnit == massUnit) &&
+            (identical(other.rotationUnit, rotationUnit) ||
+                other.rotationUnit == rotationUnit));
+  }
+
+  @override
+  int get hashCode => Object.hash(
+      runtimeType,
+      distanceUnit,
+      altitudeUnit,
+      temperatureUnit,
+      speedUnit,
+      verticalSpeedUnit,
+      windSpeedUnit,
+      taskSpeedUnit,
+      pressureUnit,
+      wingLoadingUnit,
+      massUnit,
+      rotationUnit);
 
   @JsonKey(ignore: true)
   @override
@@ -350,96 +372,63 @@ class _$UnitSettingImpl extends _UnitSetting {
 
 abstract class _UnitSetting extends UnitSetting {
   const factory _UnitSetting(
-      {required Unit distanceUnit,
-      required Unit altitudeUnit,
-      required Unit temperatureUnit,
-      required Unit speedUnit,
-      required Unit verticalSpeedUnit,
-      required Unit windSpeedUnit,
-      required Unit taskSpeedUnit,
-      required Unit pressureUnit,
-      required Unit wingLoadingUnit,
-      required Unit massUnit,
-      required Unit rotationUnit}) = _$UnitSettingImpl;
+      {final Unit distanceUnit,
+      final Unit altitudeUnit,
+      final Unit temperatureUnit,
+      final Unit speedUnit,
+      final Unit verticalSpeedUnit,
+      final Unit windSpeedUnit,
+      final Unit taskSpeedUnit,
+      final Unit pressureUnit,
+      final Unit wingLoadingUnit,
+      final Unit massUnit,
+      final Unit rotationUnit}) = _$UnitSettingImpl;
   const _UnitSetting._() : super._();
 
   @override
 
   /// Unit for distances
   Unit get distanceUnit;
-
-  /// Unit for distances
-  set distanceUnit(Unit value);
   @override
 
   /// Unit for altitudes, heights
   Unit get altitudeUnit;
-
-  /// Unit for altitudes, heights
-  set altitudeUnit(Unit value);
   @override
 
   /// Unit for temperature
   Unit get temperatureUnit;
-
-  /// Unit for temperature
-  set temperatureUnit(Unit value);
   @override
 
   /// Unit for aircraft speeds
   Unit get speedUnit;
-
-  /// Unit for aircraft speeds
-  set speedUnit(Unit value);
   @override
 
   /// Unit for vertical speeds, varios
   Unit get verticalSpeedUnit;
-
-  /// Unit for vertical speeds, varios
-  set verticalSpeedUnit(Unit value);
   @override
 
   /// Unit for wind speeds
   Unit get windSpeedUnit;
-
-  /// Unit for wind speeds
-  set windSpeedUnit(Unit value);
   @override
 
   /// Unit for task speeds
   Unit get taskSpeedUnit;
-
-  /// Unit for task speeds
-  set taskSpeedUnit(Unit value);
   @override
 
   /// Unit for pressures
   Unit get pressureUnit;
-
-  /// Unit for pressures
-  set pressureUnit(Unit value);
   @override
 
   /// Unit for wing loading
   Unit get wingLoadingUnit;
-
-  /// Unit for wing loading
-  set wingLoadingUnit(Unit value);
   @override
 
   /// Unit for mass
   Unit get massUnit;
-
-  /// Unit for mass
-  set massUnit(Unit value);
   @override
 
   /// Unit for rotation speed
   Unit get rotationUnit;
-
-  /// Unit for rotation speed
-  set rotationUnit(Unit value);
   @override
   @JsonKey(ignore: true)
   _$$UnitSettingImplCopyWith<_$UnitSettingImpl> get copyWith =>

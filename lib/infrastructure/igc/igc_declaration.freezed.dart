@@ -20,8 +20,8 @@ mixin _$IGCDeclarationHeader {
   DateTime get datetime => throw _privateConstructorUsedError;
 
   /// Date of the flight
-  DateTime get flightDate => throw _privateConstructorUsedError;
-
+  DateTime get flightDate =>
+      throw _privateConstructorUsedError; //TODO: ensure the taskId length is ok
   /// Task number on the day
   String get taskId => throw _privateConstructorUsedError; //char task_id[4]
   /// Number of task turnpoints, excluding start and finish
@@ -170,7 +170,7 @@ class _$IGCDeclarationHeaderImpl extends _IGCDeclarationHeader {
   /// Date of the flight
   @override
   final DateTime flightDate;
-
+//TODO: ensure the taskId length is ok
   /// Task number on the day
   @override
   final String taskId;
@@ -234,8 +234,7 @@ abstract class _IGCDeclarationHeader extends IGCDeclarationHeader {
 
   /// Date of the flight
   DateTime get flightDate;
-  @override
-
+  @override //TODO: ensure the taskId length is ok
   /// Task number on the day
   String get taskId;
   @override //char task_id[4]
@@ -271,6 +270,8 @@ abstract class $IGCDeclarationTurnpointCopyWith<$Res> {
       _$IGCDeclarationTurnpointCopyWithImpl<$Res, IGCDeclarationTurnpoint>;
   @useResult
   $Res call({GeoPoint location, String? name});
+
+  $GeoPointCopyWith<$Res> get location;
 }
 
 /// @nodoc
@@ -287,11 +288,11 @@ class _$IGCDeclarationTurnpointCopyWithImpl<$Res,
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? location = freezed,
+    Object? location = null,
     Object? name = freezed,
   }) {
     return _then(_value.copyWith(
-      location: freezed == location
+      location: null == location
           ? _value.location
           : location // ignore: cast_nullable_to_non_nullable
               as GeoPoint,
@@ -300,6 +301,14 @@ class _$IGCDeclarationTurnpointCopyWithImpl<$Res,
           : name // ignore: cast_nullable_to_non_nullable
               as String?,
     ) as $Val);
+  }
+
+  @override
+  @pragma('vm:prefer-inline')
+  $GeoPointCopyWith<$Res> get location {
+    return $GeoPointCopyWith<$Res>(_value.location, (value) {
+      return _then(_value.copyWith(location: value) as $Val);
+    });
   }
 }
 
@@ -313,6 +322,9 @@ abstract class _$$IGCDeclarationTurnpointImplCopyWith<$Res>
   @override
   @useResult
   $Res call({GeoPoint location, String? name});
+
+  @override
+  $GeoPointCopyWith<$Res> get location;
 }
 
 /// @nodoc
@@ -328,11 +340,11 @@ class __$$IGCDeclarationTurnpointImplCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? location = freezed,
+    Object? location = null,
     Object? name = freezed,
   }) {
     return _then(_$IGCDeclarationTurnpointImpl(
-      location: freezed == location
+      location: null == location
           ? _value.location
           : location // ignore: cast_nullable_to_non_nullable
               as GeoPoint,
@@ -368,13 +380,13 @@ class _$IGCDeclarationTurnpointImpl extends _IGCDeclarationTurnpoint {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$IGCDeclarationTurnpointImpl &&
-            const DeepCollectionEquality().equals(other.location, location) &&
+            (identical(other.location, location) ||
+                other.location == location) &&
             (identical(other.name, name) || other.name == name));
   }
 
   @override
-  int get hashCode => Object.hash(
-      runtimeType, const DeepCollectionEquality().hash(location), name);
+  int get hashCode => Object.hash(runtimeType, location, name);
 
   @JsonKey(ignore: true)
   @override

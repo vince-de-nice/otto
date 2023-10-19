@@ -1,8 +1,11 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 // Copyright The XCSoar Project
 
-#import 'package:otto/domain/entities/geo/geo_point.dart';
+import 'package:otto/domain/entities/geo/geo_point.dart';
+import 'package:otto/domain/entities/time/broken_date.dart';
+import 'package:otto/domain/entities/time/broken_time.dart';
 import 'package:otto/infrastructure/igc/igc_declaration.dart';
+import 'package:otto/infrastructure/igc/igc_fix.dart';
 import 'package:otto/infrastructure/igc/igc_header.dart';
 
 

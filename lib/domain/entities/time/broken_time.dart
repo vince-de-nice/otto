@@ -14,7 +14,7 @@ part 'broken_time.freezed.dart';
 /// A broken-down representation of a time.
 @freezed
 class BrokenTime with _$BrokenTime {
-  BrokenTime._();
+ const BrokenTime._();
 
   const factory BrokenTime({required DateTime time}) = _BrokenTime;
 

@@ -7,7 +7,7 @@ part 'igc_header.freezed.dart';
 
 @freezed
 class IGCHeader with _$IGCHeader {
-  IGCHeader._();
+  const IGCHeader._();
   const factory IGCHeader(
       {
       /// 3-letter manufacturer id.
