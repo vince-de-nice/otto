@@ -179,28 +179,21 @@ bool igcParseExtensions(String buffer, IGCExtensions extensions)
 ///
 /// @param p the string
 /// @param end the end of the string
-/// @return the result, or -1 on error
-static int parseUnsigned(String p, String end)
+/// @return the result, or null on error
+ int? parseUnsigned(String p, String end)
 {
-  int value = 0;
+  int sizeToParse = p.length - end.length;
+  return int.tryParse(p.substring(0,sizeToParse),radix: 10);
 
-  for (; p < end; ++p) {
-    if (!isDigitASCII(*p)) {
-      return -1;
-    }
-
-    value = value * 10 + (*p - '0');
-  }
-
-  return value;
 }
 
-static void parseExtensionValue(String p, String end, int value_r)
+ int? parseExtensionValue(String p, String end)
 {
-  int value = parseUnsigned(p, end);
-  if (value >= 0) {
-    value_r = value;
+  int? value = parseUnsigned(p, end);
+  if (value != null && value >= 0) {
+    return value;
   }
+  return null;
 }
 
 
@@ -339,25 +332,31 @@ return GeoPoint(longitude: longitude, latitude: latitude);
 
 /// Parse a time in IGC file format (HHMMSS).
 BrokenTime? igcParseTime(String buffer ){
-  int hour, minute, second;
+  
 
-  if (sscanf(buffer, "%02u%02u%02u", &hour, &minute, &second) != 3) {
+    final hour =int.tryParse(buffer.substring(0,2), radix: 10);
+  final minute =int.tryParse(buffer.substring(2,4), radix: 10);
+    final second =int.tryParse(buffer.substring(4,6), radix: 10);
+
+  if(hour == null ||minute == null ||second == null ) {
     return null;
   }
 
-  time = BrokenTime(hour, minute, second);
-  return time.IsPlausible();
+ final time = BrokenTime.hms(hour: hour, minute: minute, second: second);
+  return time.isPlausible()? time: null;
 }
 
- BrokenDate? date igcParseDate(String buffer)
+ BrokenDate?  igcParseDate(String buffer)
 {
-  int day, month, year;
+  final day =int.tryParse(buffer.substring(0,2), radix: 10);
+  final month =int.tryParse(buffer.substring(2,4), radix: 10);
+    final year =int.tryParse(buffer.substring(4,6), radix: 10);
 
-  if (sscanf(buffer, "%02u%02u%02u", &day, &month, &year) != 3) {
+  if(day == null ||month == null ||year == null ) {
     return null;
   }
 
-  date = BrokenDate(year + 2000, month, day);
+  final date = BrokenDate(year + 2000, month, day);
   return date.isPlausible() ? date: null;
 }
 
