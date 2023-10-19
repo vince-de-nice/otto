@@ -26,33 +26,31 @@ GeoPoint? geoPoint;
 const String c36 = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 /// Convert a 5 digit logger serial to a 3 letter logger id.
-static void
-ImportDeprecatedLoggerSerial(char id[4], unsigned serial)
+static int importDeprecatedLoggerSerial(String id)
 {
   id[0] = c36[(serial / 36 / 36) % 36];
   id[1] = c36[(serial / 36) % 36];
   id[2] = c36[serial % 36];
   id[3] = 0;
+  return id;
 }
 
 /// Parse an igc "A" record.
-///
-/// @return true on success, false if the line was not recognized
-bool
-igcParseHeader(String line, IGCHeader &header)bool
+
+ IGCHeader? igcParseHeader(String line )
 
 {
   /* sample from CAI302: "ACAM3OV" */
   /* sample from Colibri: "ALXN13103FLIGHT:1" */
 
   if (line[0] != 'A') {
-    return false;
+    return null;
   }
 
   ++line;
   size_t length = strlen(line);
   if (length < 6) {
-    return false;
+    return null;
   }
 
   memcpy(header.manufacturer, line, 3);
@@ -63,7 +61,7 @@ igcParseHeader(String line, IGCHeader &header)bool
   unsigned long serial = strtoul(line, &endptr, 10);
   if (endptr == line + 5) {
     /* deprecated: numeric serial, 5 digits (e.g. from Colibri) */
-    ImportDeprecatedLoggerSerial(header.id, serial);
+    serial = importDeprecatedLoggerSerial(header.id);
     line = endptr;
   } else {
     memcpy(header.id, line, 3);
@@ -82,11 +80,10 @@ igcParseHeader(String line, IGCHeader &header)bool
 /// Parse an IGC "HFDTE" record.
 ///
 /// @return true on success, false if the line was not recognized
-bool
-igcParseDateRecord(String line, BrokenDate date){
-  line = StringAfterPrefix(line, "HFDTE");
+BrokenDate? date igcParseDateRecord(String line ){
+  line = stringAfterPrefix(line, "HFDTE");
   if (line == nullptr) {
-    return false;
+    return null;
   }
 
   if (auto date = StringAfterPrefix(line, "DATE"sv))
@@ -99,7 +96,7 @@ igcParseDateRecord(String line, BrokenDate date){
   char *endptr;
   unsigned long value = strtoul(line, &endptr, 10);
   if (endptr != line + 6) {
-    return false;
+    return null;
   }
 
   date.year = 1990 + (value + 10) % 100; /* Y2090 bug! */
@@ -110,8 +107,7 @@ igcParseDateRecord(String line, BrokenDate date){
 }
 
 
-static int
-parseTwoDigits(String p)
+static int parseTwoDigits(String p)
 {
   if (!IsDigitASCII(p[0]) || !IsDigitASCII(p[1])) {
     return -1;
@@ -120,8 +116,7 @@ parseTwoDigits(String p)
   return (p[0] - '0') * 10 + (p[1] - '0');
 }
 
-static bool
-checkThreeAlphaNumeric(String src)
+static bool checkThreeAlphaNumeric(String src)
 {
   return isAlphaNumericASCII(src[0]) && isAlphaNumericASCII(src[1]) &&
     isAlphaNumericASCII(src[2]);
@@ -130,14 +125,13 @@ checkThreeAlphaNumeric(String src)
 /// Parse an IGC "I" record.
 ///
 /// @return true on success, false if the line was not recognized
-bool
-igcParseExtensions(String buffer, IGCExtensions extensions)
+bool igcParseExtensions(String buffer, IGCExtensions extensions)
 {
   if (*buffer++ != 'I') {
     return false;
   }
 
-  int count = ParseTwoDigits(buffer);
+  int count = parseTwoDigits(buffer);
   if (count < 0) {
     return false;
   }
@@ -186,8 +180,7 @@ igcParseExtensions(String buffer, IGCExtensions extensions)
 /// @param p the string
 /// @param end the end of the string
 /// @return the result, or -1 on error
-static int
-parseUnsigned(String p, String end)
+static int parseUnsigned(String p, String end)
 {
   int value = 0;
 
@@ -202,8 +195,7 @@ parseUnsigned(String p, String end)
   return value;
 }
 
-static void
-parseExtensionValue(String p, String end, int value_r)
+static void parseExtensionValue(String p, String end, int value_r)
 {
   int value = parseUnsigned(p, end);
   if (value >= 0) {
@@ -217,8 +209,7 @@ parseExtensionValue(String p, String end, int value_r)
 /// is not long enough, nothing is parsed.  This is used to account for
 /// columns that are longer than specified; according to LXNav, this is
 /// used for decimal places (which are ignored by this function).
-static void
-parseExtensionValueN(String p, String end, size_t n,
+static void parseExtensionValueN(String p, String end, size_t n,
                      int16_t &value_r)
 {
   if (n > (size_t)(p - end)) {
@@ -269,17 +260,14 @@ return GeoPoint(longitude: longitude, latitude: latitude);
 }
 
 /// Parse an IGC "B" record.
-///
-/// @return true on success, false if the line was not recognized
-bool
-igcParseFix(String buffer, const IGCExtensions &extensions, IGCFix &fix){
+(IGCExtensions? extensions, IGCFix? fix) igcParseFix(String buffer ){
   if (*buffer != 'B') {
-    return false;
+    return (null,null);
   }
 
   BrokenTime time;
   if (!igcParseTime(buffer + 1, time)) {
-    return false;
+    return (null,null);
   }
 
   char valid_char;
@@ -287,7 +275,7 @@ igcParseFix(String buffer, const IGCExtensions &extensions, IGCFix &fix){
 
   if (sscanf(buffer + 24, "%c%05d%05d",
              &valid_char, &pressure_altitude, &gps_altitude) != 3) {
-    return false;
+    return (null,null);
   }
 
   if (valid_char == 'A') {
@@ -295,13 +283,15 @@ igcParseFix(String buffer, const IGCExtensions &extensions, IGCFix &fix){
   } else if (valid_char == 'V'){
     fix.gps_valid = false;
    } else {
-    return false;
+    return (null,null);
+
    }
   fix.gps_altitude = gps_altitude;
   fix.pressure_altitude = pressure_altitude;
 
   if (!igcParseLocation(buffer + 7, fix.location)) {
-    return false;
+        return (null,null);
+
   }
 
   fix.time = time;
@@ -344,52 +334,46 @@ igcParseFix(String buffer, const IGCExtensions &extensions, IGCFix &fix){
       parseExtensionValue(start, finish, fix.siu);
   }
 
-  return true;
+
 }
 
 /// Parse a time in IGC file format (HHMMSS).
-///
-/// @return true on success, false if the time was not recognized
-bool
-igcParseTime(String buffer, BrokenTime &time){
+BrokenTime? igcParseTime(String buffer ){
   int hour, minute, second;
 
   if (sscanf(buffer, "%02u%02u%02u", &hour, &minute, &second) != 3) {
-    return false;
+    return null;
   }
 
   time = BrokenTime(hour, minute, second);
   return time.IsPlausible();
 }
 
-static bool
-igcParseDate(String buffer, BrokenDate &date)
+ BrokenDate? date igcParseDate(String buffer)
 {
-  unsigned day, month, year;
+  int day, month, year;
 
   if (sscanf(buffer, "%02u%02u%02u", &day, &month, &year) != 3) {
-    return false;
+    return null;
   }
 
   date = BrokenDate(year + 2000, month, day);
-  return date.IsPlausible();
+  return date.isPlausible() ? date: null;
 }
 
 /// Parse an IGC "C" header record.
-///
-/// @return true on success, false if the line was not recognized
-bool
-igcParseDeclarationHeader(String line, IGCDeclarationHeader &header){
+
+IGCDeclarationHeader? igcParseDeclarationHeader(String line ){
   if (*line != 'C' || strlen(line) < 25) {
-    return false;
+    return null;
   }
 
   if (!igcParseDate(line + 1, header.datetime)) {
-    return false;
+    return null;
   }
 
   if (!igcParseTime(line + 7, header.datetime)) {
-    return false;
+    return null;
   }
 
   if (!igcParseDate(line + 13, header.flight_date)) {
@@ -398,7 +382,7 @@ igcParseDeclarationHeader(String line, IGCDeclarationHeader &header){
 
   if (!sscanf(line + 23, "%02u", &header.num_turnpoints) ||
       header.num_turnpoints > 99) {
-    return false;
+    return null;
   }
 
   std.copy(line + 19, line + 23, header.task_id);
@@ -417,6 +401,6 @@ final loc = igcParseLocation(line.substring(1));
     return null;
   }
 
- return IGCDeclarationTurnpoint(location:  loc,name:  line.substring(18));
+ return IGCDeclarationTurnpoint(location:  loc!,name:  line.substring(18));
   
 }

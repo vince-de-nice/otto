@@ -41,7 +41,7 @@ class IGCDeclarationHeader with _$IGCDeclarationHeader {
 class IGCDeclarationTurnpoint with _$IGCDeclarationTurnpoint {
   const IGCDeclarationTurnpoint._();
 
-  const factory IGCDeclarationTurnpoint(loc, 
+  const factory IGCDeclarationTurnpoint( 
       {
       /// Location of the turnpoint
       required GeoPoint location,
