@@ -2,9 +2,11 @@
 // Copyright The XCSoar Project
 
 import 'package:otto/domain/entities/geo/geo_point.dart';
+import 'package:otto/domain/entities/math/angle.dart';
 import 'package:otto/domain/entities/time/broken_date.dart';
 import 'package:otto/domain/entities/time/broken_time.dart';
 import 'package:otto/infrastructure/igc/igc_declaration.dart';
+import 'package:otto/infrastructure/igc/igc_extensions.dart';
 import 'package:otto/infrastructure/igc/igc_fix.dart';
 import 'package:otto/infrastructure/igc/igc_header.dart';
 
@@ -19,7 +21,7 @@ BrokenTime? brokenTime;
 GeoPoint? geoPoint;
 
 
-// using std::string_view_literals::operator""sv;
+// using std.string_view_literals.operator""sv;
 /// Character table for base-36.
 const String c36 = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
@@ -33,11 +35,11 @@ ImportDeprecatedLoggerSerial(char id[4], unsigned serial)
   id[3] = 0;
 }
 
-/// Parse an IGC "A" record.
+/// Parse an igc "A" record.
 ///
 /// @return true on success, false if the line was not recognized
 bool
-IGCParseHeader(String line, IGCHeader &header)bool
+igcParseHeader(String line, IGCHeader &header)bool
 
 {
   /* sample from CAI302: "ACAM3OV" */
@@ -81,7 +83,7 @@ IGCParseHeader(String line, IGCHeader &header)bool
 ///
 /// @return true on success, false if the line was not recognized
 bool
-IGCParseDateRecord(String line, BrokenDate &date){
+igcParseDateRecord(String line, BrokenDate date){
   line = StringAfterPrefix(line, "HFDTE");
   if (line == nullptr) {
     return false;
@@ -109,7 +111,7 @@ IGCParseDateRecord(String line, BrokenDate &date){
 
 
 static int
-ParseTwoDigits(String p)
+parseTwoDigits(String p)
 {
   if (!IsDigitASCII(p[0]) || !IsDigitASCII(p[1])) {
     return -1;
@@ -119,18 +121,17 @@ ParseTwoDigits(String p)
 }
 
 static bool
-CheckThreeAlphaNumeric(String src)
+checkThreeAlphaNumeric(String src)
 {
-  return IsAlphaNumericASCII(src[0]) && IsAlphaNumericASCII(src[1]) &&
-    IsAlphaNumericASCII(src[2]);
+  return isAlphaNumericASCII(src[0]) && isAlphaNumericASCII(src[1]) &&
+    isAlphaNumericASCII(src[2]);
 }
 
 /// Parse an IGC "I" record.
 ///
 /// @return true on success, false if the line was not recognized
 bool
-IGCParseExtensions(String buffer, IGCExtensions &extensions)bool
-
+igcParseExtensions(String buffer, IGCExtensions extensions)
 {
   if (*buffer++ != 'I') {
     return false;
@@ -146,21 +147,21 @@ IGCParseExtensions(String buffer, IGCExtensions &extensions)bool
   extensions.clear();
 
   while (count-- > 0) {
-    const int start = ParseTwoDigits(buffer);
+    const int start = parseTwoDigits(buffer);
     if (start < 8) {
       return false;
     }
 
     buffer += 2;
 
-    const int finish = ParseTwoDigits(buffer);
+    const int finish = parseTwoDigits(buffer);
     if (finish < start) {
       return false;
     }
 
     buffer += 2;
 
-    if (!CheckThreeAlphaNumeric(buffer))
+    if (!checkThreeAlphaNumeric(buffer))
       return false;
 
     if (extensions.full()) {
@@ -186,12 +187,12 @@ IGCParseExtensions(String buffer, IGCExtensions &extensions)bool
 /// @param end the end of the string
 /// @return the result, or -1 on error
 static int
-ParseUnsigned(String p, String end)
+parseUnsigned(String p, String end)
 {
-  unsigned value = 0;
+  int value = 0;
 
   for (; p < end; ++p) {
-    if (!IsDigitASCII(*p)) {
+    if (!isDigitASCII(*p)) {
       return -1;
     }
 
@@ -202,9 +203,9 @@ ParseUnsigned(String p, String end)
 }
 
 static void
-ParseExtensionValue(String p, String end, int16_t &value_r)
+parseExtensionValue(String p, String end, int value_r)
 {
-  int value = ParseUnsigned(p, end);
+  int value = parseUnsigned(p, end);
   if (value >= 0) {
     value_r = value;
   }
@@ -217,7 +218,7 @@ ParseExtensionValue(String p, String end, int16_t &value_r)
 /// columns that are longer than specified; according to LXNav, this is
 /// used for decimal places (which are ignored by this function).
 static void
-ParseExtensionValueN(String p, String end, size_t n,
+parseExtensionValueN(String p, String end, size_t n,
                      int16_t &value_r)
 {
   if (n > (size_t)(p - end)) {
@@ -225,7 +226,7 @@ ParseExtensionValueN(String p, String end, size_t n,
     return;
   }
 
-  int value = ParseUnsigned(p, p + n);
+  int value = parseUnsigned(p, p + n);
   if (value >= 0) {
     value_r = value;
   }
@@ -234,53 +235,50 @@ ParseExtensionValueN(String p, String end, size_t n,
 /// Parse a location in IGC file format. (DDMMmmm[N/S]DDDMMmmm[E/W])
 ///
 /// @return true on success, false if the location was not recognized
-bool
-IGCParseLocation(String buffer, GeoPoint &location){
-  unsigned lat_degrees, lat_minutes, lon_degrees, lon_minutes;
-  char lat_char, lon_char;
+GeoPoint? location igcParseLocation(String buffer ){
+  int lat_degrees, lat_minutes, lon_degrees, lon_minutes;
+  String lat_char, lon_char;
 
   if (sscanf(buffer, "%02u%05u%c%03u%05u%c",
              &lat_degrees, &lat_minutes, &lat_char,
              &lon_degrees, &lon_minutes, &lon_char) != 6) {
-    return false;
+    return null;
   }
 
   if (lat_degrees >= 90 || lat_minutes >= 60000 ||
       (lat_char != 'N' && lat_char != 'S')) {
-    return false;
+    return null;
   }
 
   if (lon_degrees >= 180 || lon_minutes >= 60000 ||
       (lon_char != 'E' && lon_char != 'W')) {
-    return false;
+    return null;
   }
 
-  location.latitude = Angle::Degrees(lat_degrees +
-                                     lat_minutes / 60000.);
+  var latitude = Angle.degrees(lat_degrees +  lat_minutes / 60000);
   if (lat_char == 'S') {
-    location.latitude.Flip();
+    latitude= latitude.fliped();
   }
 
-  location.longitude = Angle::Degrees(lon_degrees +
-                                      lon_minutes / 60000.);
+  Angle longitude = Angle.degrees(lon_degrees + lon_minutes / 60000);
   if (lon_char == 'W') {
-    location.longitude.Flip();
+    longitude = longitude.fliped();
   }
 
-  return true;
+return GeoPoint(longitude: longitude, latitude: latitude);
 }
 
 /// Parse an IGC "B" record.
 ///
 /// @return true on success, false if the line was not recognized
 bool
-IGCParseFix(String buffer, const IGCExtensions &extensions, IGCFix &fix){
+igcParseFix(String buffer, const IGCExtensions &extensions, IGCFix &fix){
   if (*buffer != 'B') {
     return false;
   }
 
   BrokenTime time;
-  if (!IGCParseTime(buffer + 1, time)) {
+  if (!igcParseTime(buffer + 1, time)) {
     return false;
   }
 
@@ -302,7 +300,7 @@ IGCParseFix(String buffer, const IGCExtensions &extensions, IGCFix &fix){
   fix.gps_altitude = gps_altitude;
   fix.pressure_altitude = pressure_altitude;
 
-  if (!IGCParseLocation(buffer + 7, fix.location)) {
+  if (!igcParseLocation(buffer + 7, fix.location)) {
     return false;
   }
 
@@ -325,25 +323,25 @@ IGCParseFix(String buffer, const IGCExtensions &extensions, IGCFix &fix){
     String finish = buffer + extension.finish;
 
     if (StringIsEqual(extension.code, "ENL"))
-      ParseExtensionValue(start, finish, fix.enl);
+      parseExtensionValue(start, finish, fix.enl);
     else if (StringIsEqual(extension.code, "RPM"))
-      ParseExtensionValue(start, finish, fix.rpm);
+      parseExtensionValue(start, finish, fix.rpm);
     else if (StringIsEqual(extension.code, "HDM"))
-      ParseExtensionValue(start, finish, fix.hdm);
+      parseExtensionValue(start, finish, fix.hdm);
     else if (StringIsEqual(extension.code, "HDT"))
-      ParseExtensionValue(start, finish, fix.hdt);
+      parseExtensionValue(start, finish, fix.hdt);
     else if (StringIsEqual(extension.code, "TRM"))
-      ParseExtensionValue(start, finish, fix.trm);
+      parseExtensionValue(start, finish, fix.trm);
     else if (StringIsEqual(extension.code, "TRT"))
-      ParseExtensionValue(start, finish, fix.trt);
+      parseExtensionValue(start, finish, fix.trt);
     else if (StringIsEqual(extension.code, "GSP"))
-      ParseExtensionValueN(start, finish, 3, fix.gsp);
+      parseExtensionValueN(start, finish, 3, fix.gsp);
     else if (StringIsEqual(extension.code, "IAS"))
-      ParseExtensionValueN(start, finish, 3, fix.ias);
+      parseExtensionValueN(start, finish, 3, fix.ias);
     else if (StringIsEqual(extension.code, "TAS"))
-      ParseExtensionValueN(start, finish, 3, fix.tas);
+      parseExtensionValueN(start, finish, 3, fix.tas);
     else if (StringIsEqual(extension.code, "SIU"))
-      ParseExtensionValue(start, finish, fix.siu);
+      parseExtensionValue(start, finish, fix.siu);
   }
 
   return true;
@@ -353,8 +351,8 @@ IGCParseFix(String buffer, const IGCExtensions &extensions, IGCFix &fix){
 ///
 /// @return true on success, false if the time was not recognized
 bool
-IGCParseTime(String buffer, BrokenTime &time){
-  unsigned hour, minute, second;
+igcParseTime(String buffer, BrokenTime &time){
+  int hour, minute, second;
 
   if (sscanf(buffer, "%02u%02u%02u", &hour, &minute, &second) != 3) {
     return false;
@@ -365,7 +363,7 @@ IGCParseTime(String buffer, BrokenTime &time){
 }
 
 static bool
-IGCParseDate(String buffer, BrokenDate &date)
+igcParseDate(String buffer, BrokenDate &date)
 {
   unsigned day, month, year;
 
@@ -381,20 +379,20 @@ IGCParseDate(String buffer, BrokenDate &date)
 ///
 /// @return true on success, false if the line was not recognized
 bool
-IGCParseDeclarationHeader(String line, IGCDeclarationHeader &header){
+igcParseDeclarationHeader(String line, IGCDeclarationHeader &header){
   if (*line != 'C' || strlen(line) < 25) {
     return false;
   }
 
-  if (!IGCParseDate(line + 1, header.datetime)) {
+  if (!igcParseDate(line + 1, header.datetime)) {
     return false;
   }
 
-  if (!IGCParseTime(line + 7, header.datetime)) {
+  if (!igcParseTime(line + 7, header.datetime)) {
     return false;
   }
 
-  if (!IGCParseDate(line + 13, header.flight_date)) {
+  if (!igcParseDate(line + 13, header.flight_date)) {
     header.flight_date.Clear();
   }
 
@@ -403,25 +401,22 @@ IGCParseDeclarationHeader(String line, IGCDeclarationHeader &header){
     return false;
   }
 
-  std::copy(line + 19, line + 23, header.task_id);
+  std.copy(line + 19, line + 23, header.task_id);
 
   header.task_name = line + 25;
   return true;
 }
 
 /// Parse an IGC "C" turnpoint record.
-///
-/// @return true on success, false if the line was not recognized
-bool
-IGCParseDeclarationTurnpoint(String line, IGCDeclarationTurnpoint &tp){
-  if (*line != 'C' || strlen(line) < 18) {
-    return false;
+IGCDeclarationTurnpoint? igcParseDeclarationTurnpoint(String line  ){
+  if (line[0] != 'C' || line.length < 18) {
+    return null;
+  }
+final loc = igcParseLocation(line.substring(1));
+  if (loc == null) {
+    return null;
   }
 
-  if (!IGCParseLocation(line + 1, tp.location)) {
-    return false;
-  }
-
-  tp.name = line + 18;
-  return true;
+ return IGCDeclarationTurnpoint(location:  loc,name:  line.substring(18));
+  
 }

@@ -189,11 +189,10 @@ class Angle {
     return value < 0;
   }
 
-
-  (double sin, double cos)  sinCos()  {
+  (double sin, double cos) sinCos() {
     double sin = math.sin(radians());
     double cos = math.cos(radians());
-    return (sin,cos);
+    return (sin, cos);
   }
 
 //   double absoluteDegrees()
@@ -205,9 +204,9 @@ class Angle {
 //   return absolute().radians();
 // }
 
-  // void Flip()  {
-  //   value = -value;
-  // }
+  Angle fliped() {
+    return Angle(-value);
+  }
 
   factory Angle.flipped(double angleValue) {
     return Angle.native(-angleValue);
@@ -393,8 +392,8 @@ class Angle {
   /// @param x x-coordinate
   /// @param y y-coordinate
   /// @return Counter-clockwise angle between the x-axis and the given coordinate
-  factory Angle.fromXY( double x,  double y)  {
-    return Angle.radians(atan2(y,x));
+  factory Angle.fromXY(double x, double y) {
+    return Angle.radians(atan2(y, x));
   }
 
 //   /// Check whether the two angles are roughly equal.

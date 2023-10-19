@@ -12,7 +12,7 @@ part 'igc_declaration.freezed.dart';
 
 @freezed
 class IGCDeclarationHeader with _$IGCDeclarationHeader {
-  IGCDeclarationHeader._();
+  const IGCDeclarationHeader._();
 
   const factory IGCDeclarationHeader(
       {
@@ -41,7 +41,7 @@ class IGCDeclarationHeader with _$IGCDeclarationHeader {
 class IGCDeclarationTurnpoint with _$IGCDeclarationTurnpoint {
   const IGCDeclarationTurnpoint._();
 
-  const factory IGCDeclarationTurnpoint(
+  const factory IGCDeclarationTurnpoint(loc, 
       {
       /// Location of the turnpoint
       required GeoPoint location,
