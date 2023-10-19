@@ -10,296 +10,266 @@
 
 // class AtmosphericPressure;
 
-import 'package:otto/domain/entities/athmosphere/atmospheric_pressure.dart';
 import 'package:otto/domain/entities/units/unit.dart';
 import 'package:otto/domain/entities/units/unit_group.dart';
 import 'package:otto/domain/entities/units/unit_settings.dart';
 
-const DEG =  "°";
+// const DEG =  "°";
 
-var current =const UnitSetting(
-    distanceUnit : Unit.kilometer,
-  altitudeUnit : Unit.meter,
-  temperatureUnit : Unit.degreesCelcius,
-  speedUnit : Unit.kilometerPerHour,
-  verticalSpeedUnit : Unit.meterPerSecond,
-  windSpeedUnit : Unit.kilometerPerHour,
-  taskSpeedUnit : Unit.kilometerPerHour,
-  pressureUnit : Unit.hectopascal,
-  wingLoadingUnit : Unit.kgPerM2,
-  massUnit : Unit.kg,
-  rotationUnit : Unit.rpm,
-
+var current = const UnitSetting(
+  distanceUnit: Unit.kilometer,
+  altitudeUnit: Unit.meter,
+  temperatureUnit: Unit.degreesCelcius,
+  speedUnit: Unit.kilometerPerHour,
+  verticalSpeedUnit: Unit.meterPerSecond,
+  windSpeedUnit: Unit.kilometerPerHour,
+  taskSpeedUnit: Unit.kilometerPerHour,
+  pressureUnit: Unit.hectopascal,
+  wingLoadingUnit: Unit.kgPerM2,
+  massUnit: Unit.kg,
+  rotationUnit: Unit.rpm,
 );
 
 /// Namespace to manage unit conversions.
 /// internal system units are (metric SI).
-abstract class Units {
-
+class Units {
 // extern UnitSetting current;
 
-void
-setConfig( UnitSetting newConfig){
-  current = newConfig;
-}
-/// Returns the user-specified unit for a wing loading
-/// @return The user-specified unit for a wing loading
+  void setConfig(UnitSetting newConfig) {
+    current = newConfig;
+  }
 
-Unit
-getUserWingLoadingUnit(){
-  return current.wingLoadingUnit;
-}
-/// Returns the user-specified unit for mass
-/// @return The user-specified unit for mass
+  /// Returns the user-specified unit for a wing loading
+  /// @return The user-specified unit for a wing loading
 
-Unit
-getUserMassUnit(){
-  return current.massUnit;
-}
+  Unit getUserWingLoadingUnit() {
+    return current.wingLoadingUnit;
+  }
 
-/// Returns the user-specified unit for a horizontal distance
-/// @return The user-specified unit for a horizontal distance
+  /// Returns the user-specified unit for mass
+  /// @return The user-specified unit for mass
 
-Unit
-getUserDistanceUnit(){
-  return current.distanceUnit;
-}
+  Unit getUserMassUnit() {
+    return current.massUnit;
+  }
 
-/// Returns the user-specified unit for an altitude
-/// @return The user-specified unit for an altitude
+  /// Returns the user-specified unit for a horizontal distance
+  /// @return The user-specified unit for a horizontal distance
 
-Unit
-getUserAltitudeUnit(){
-  return current.altitudeUnit;
-}
+  Unit getUserDistanceUnit() {
+    return current.distanceUnit;
+  }
 
-/// Returns the user-specified unit for a temperature
-/// @return The user-specified unit for a temperature
+  /// Returns the user-specified unit for an altitude
+  /// @return The user-specified unit for an altitude
 
-Unit
-getUserTemperatureUnit(){
-  return current.temperatureUnit;
-}
+  Unit getUserAltitudeUnit() {
+    return current.altitudeUnit;
+  }
 
-/// Returns the user-specified unit for a horizontal speed
-/// @return The user-specified unit for a horizontal speed
+  /// Returns the user-specified unit for a temperature
+  /// @return The user-specified unit for a temperature
 
-Unit
-getUserSpeedUnit(){
-  return current.speedUnit;
-}
+  Unit getUserTemperatureUnit() {
+    return current.temperatureUnit;
+  }
 
-/// Returns the user-specified unit for a task speed
-/// @return The user-specified unit for a task speed
+  /// Returns the user-specified unit for a horizontal speed
+  /// @return The user-specified unit for a horizontal speed
 
-Unit
-getUserTaskSpeedUnit(){
-  return current.taskSpeedUnit;
-}
+  Unit getUserSpeedUnit() {
+    return current.speedUnit;
+  }
 
-/// Returns the user-specified unit for a vertical speed
-/// @return The user-specified unit for a vertical speed
+  /// Returns the user-specified unit for a task speed
+  /// @return The user-specified unit for a task speed
 
-Unit
-getUserVerticalSpeedUnit(){
-  return current.verticalSpeedUnit;
-}
+  Unit getUserTaskSpeedUnit() {
+    return current.taskSpeedUnit;
+  }
 
+  /// Returns the user-specified unit for a vertical speed
+  /// @return The user-specified unit for a vertical speed
 
-/// Returns the user-specified unit for a wind speed
-/// @return The user-specified unit for a wind speed
+  Unit getUserVerticalSpeedUnit() {
+    return current.verticalSpeedUnit;
+  }
 
-Unit
-getUserWindSpeedUnit(){
-  return current.windSpeedUnit;
-}
+  /// Returns the user-specified unit for a wind speed
+  /// @return The user-specified unit for a wind speed
 
-/// Returns the user-specified unit for a pressure
-/// @return The user-specified unit for a pressure
+  Unit getUserWindSpeedUnit() {
+    return current.windSpeedUnit;
+  }
 
-Unit
-getUserPressureUnit(){
-  return current.pressureUnit;
-}
+  /// Returns the user-specified unit for a pressure
+  /// @return The user-specified unit for a pressure
 
+  Unit getUserPressureUnit() {
+    return current.pressureUnit;
+  }
 
-Unit
-getUserUnitByGroup(UnitGroup group){
-  return current.getByGroup(group);
-}
+  Unit getUserUnitByGroup(UnitGroup group) {
+    return current.getByGroup(group);
+  }
 
+// String
+// getSpeedName(){
+//   return getUnitName(getUserSpeedUnit());
+// }
 
-String
-getSpeedName(){
-  return getUnitName(getUserSpeedUnit());
-}
+// String
+// getVerticalSpeedName(){
+//   return getUnitName(getUserVerticalSpeedUnit());
+// }
 
+// String
+// getWindSpeedName(){
+//   return getUnitName(getUserWindSpeedUnit());
+// }
 
-String
-getVerticalSpeedName(){
-  return getUnitName(getUserVerticalSpeedUnit());
-}
+// String
+// getDistanceName(){
+//   return getUnitName(getUserDistanceUnit());
+// }
 
+// String
+// getAltitudeName(){
+//   return getUnitName(getUserAltitudeUnit());
+// }
 
-String
-getWindSpeedName(){
-  return getUnitName(getUserWindSpeedUnit());
-}
+// String
+// getTemperatureName(){
+//   return getUnitName(getUserTemperatureUnit());
+// }
 
+// String
+// getTaskSpeedName(){
+//   return getUnitName(getUserTaskSpeedUnit());
+// }
 
-String
-getDistanceName(){
-  return getUnitName(getUserDistanceUnit());
-}
+// String
+// getPressureName(){
+//   return getUnitName(getUserPressureUnit());
+// }
 
+// static  double
+// toUserAltitude(double value)
+// {
+//   return toUserUnit(value, current.altitudeUnit);
+// }
 
-String
-getAltitudeName(){
-  return getUnitName(getUserAltitudeUnit());
-}
+// static  double
+// toSysAltitude(double value)
+// {
+//   return toSysUnit(value, current.altitudeUnit);
+// }
 
+// static  double
+// toUserDistance(double value)
+// {
+//   return toUserUnit(value, current.distanceUnit);
+// }
 
+// static  double
+// toSysDistance(double value)
+// {
+//   return toSysUnit(value, current.distanceUnit);
+// }
 
-String
-getTemperatureName(){
-  return getUnitName(getUserTemperatureUnit());
-}
+// static  double
+// toUserSpeed(double value)
+// {
+//   return toUserUnit(value, current.speedUnit);
+// }
 
+// static  double
+// toSysSpeed(double value)
+// {
+//   return toSysUnit(value, current.speedUnit);
+// }
 
-String
-getTaskSpeedName(){
-  return getUnitName(getUserTaskSpeedUnit());
-}
+// static  double
+// toUserVSpeed(double value)
+// {
+//   return toUserUnit(value, current.verticalSpeedUnit);
+// }
 
+// static  double
+// toSysVSpeed(double value)
+// {
+//   return toSysUnit(value, current.verticalSpeedUnit);
+// }
 
-String
-getPressureName(){
-  return getUnitName(getUserPressureUnit());
-}
+// static  double
+// toUserTaskSpeed(double value)
+// {
+//   return toUserUnit(value, current.taskSpeedUnit);
+// }
 
-static  double
-toUserAltitude(double value)
-{
-  return toUserUnit(value, current.altitudeUnit);
-}
+// static  double
+// toSysTaskSpeed(double value)
+// {
+//   return toSysUnit(value, current.taskSpeedUnit);
+// }
 
-static  double
-toSysAltitude(double value)
-{
-  return toSysUnit(value, current.altitudeUnit);
-}
+// static  double
+// toUserWindSpeed(double value)
+// {
+//   return toUserUnit(value, current.windSpeedUnit);
+// }
 
-static  double
-toUserDistance(double value)
-{
-  return toUserUnit(value, current.distanceUnit);
-}
+// static  double
+// toSysWindSpeed(double value)
+// {
+//   return toSysUnit(value, current.windSpeedUnit);
+// }
 
-static  double
-toSysDistance(double value)
-{
-  return toSysUnit(value, current.distanceUnit);
-}
+// static  double
+// toUserPressure(double Value)
+// {
+//   return toUserUnit(Value, current.pressureUnit);
+// }
 
-static  double
-toUserSpeed(double value)
-{
-  return toUserUnit(value, current.speedUnit);
-}
+// double
+// toUserPressure(AtmosphericPressure value){
+//   return toUserPressure(value.getHectoPascal());
+// }
 
-static  double
-toSysSpeed(double value)
-{
-  return toSysUnit(value, current.speedUnit);
-}
+// static  double
+// toSysPressure(double Value)
+// {
+//   return toSysUnit(Value, current.pressureUnit);
+// }
 
-static  double
-toUserVSpeed(double value)
-{
-  return toUserUnit(value, current.verticalSpeedUnit);
-}
+// /// Convert a pressure value from the user unit to an
+// /// #AtmosphericPressure object.
+// AtmosphericPressure
+// fromUserPressure(double value){
+//   return AtmosphericPressure.hectoPascal(toSysPressure(value));
+// }
 
-static  double
-toSysVSpeed(double value)
-{
-  return toSysUnit(value, current.verticalSpeedUnit);
-}
+// static  double
+// toUserMass(double Value)
+// {
+//   return toUserUnit(Value, current.massUnit);
+// }
 
-static  double
-toUserTaskSpeed(double value)
-{
-  return toUserUnit(value, current.taskSpeedUnit);
-}
+// static  double
+// toSysMass(double Value)
+// {
+//   return toSysUnit(Value, current.massUnit);
+// }
 
-static  double
-toSysTaskSpeed(double value)
-{
-  return toSysUnit(value, current.taskSpeedUnit);
-}
+// static  double
+// toUserRotation(double Value)
+// {
+//   return toUserUnit(Value, current.rotationUnit);
+// }
 
-static  double
-toUserWindSpeed(double value)
-{
-  return toUserUnit(value, current.windSpeedUnit);
-}
-
-static  double
-toSysWindSpeed(double value)
-{
-  return toSysUnit(value, current.windSpeedUnit);
-}
-
-static  double
-toUserPressure(double Value)
-{
-  return toUserUnit(Value, current.pressureUnit);
-}
-  
-
-double
-toUserPressure(AtmosphericPressure value){
-  return toUserPressure(value.getHectoPascal());
-}
-
-static  double
-toSysPressure(double Value)
-{
-  return toSysUnit(Value, current.pressureUnit);
-}
-
-/// Convert a pressure value from the user unit to an
-/// #AtmosphericPressure object.
-AtmosphericPressure 
-fromUserPressure(double value){
-  return AtmosphericPressure.hectoPascal(toSysPressure(value));
-}
-  
-static  double
-toUserMass(double Value)
-{
-  return toUserUnit(Value, current.massUnit);
-}
-  
-static  double
-toSysMass(double Value)
-{
-  return toSysUnit(Value, current.massUnit);
-}
-
-static  double
-toUserRotation(double Value) 
-{
-  return toUserUnit(Value, current.rotationUnit);
-}
-
-static  double
-toSysRotation(double Value) 
-{
-  return toSysUnit(Value, current.rotationUnit);
-}
-
-
-
-
-
+// static  double
+// toSysRotation(double Value)
+// {
+//   return toSysUnit(Value, current.rotationUnit);
+// }
 } // namespace Units

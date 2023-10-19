@@ -1,62 +1,60 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 // Copyright The XCSoar Project
 
-
-
 // #include "Geo/GeoPoint.hpp"
 // #include "time/BrokenTime.hpp"
 
- import 'package:otto/domain/entities/geo/geo_point.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:otto/domain/entities/geo/geo_point.dart';
 import 'package:otto/domain/entities/time/broken_time.dart';
-import 'package:otto/domain/entities/units/unit.dart';
 
-NMEAInfo nMEAInfo;
+part 'igc_fix.freezed.dart';
 
+@unfreezed
+class IGCFix with _$IGCFix {
+  IGCFix._();
+  factory IGCFix({
+    required BrokenTime time,
+    required GeoPoint location,
+    required bool gpsValid,
+    required int gpsAltitude,
+    pressureAltitude,
 
-class IGCFix
-{
-  BrokenTime time;
+    /* extensions follow */
 
-  GeoPoint location;
+    /// Engine noise level [0 to 999].  null if undefined.
+    int? enl,
 
-  bool gpsValid;
+    /// Forward thrust, e.g. engine rpm [0 to 999].  Negative if
+    /// undefined.
+    int? rpm,
 
-  int gpsAltitude, pressureAltitude;
+    /// Magnetic heading [degrees].  null if undefined.
+    int? hdm,
 
-  /* extensions follow */
+    /// True heading [degrees].  null if undefined.
+    int? hdt,
 
-  /// Engine noise level [0 to 999].  null if undefined.
-  int? enl;
+    /// Magnetic track [degrees].  null if undefined.
+    int? trm,
 
-  /// Forward thrust, e.g. engine rpm [0 to 999].  Negative if
-  /// undefined.
-  int? rpm;
+    /// True track [degrees].  null if undefined.
+    int? trt,
 
-  /// Magnetic heading [degrees].  null if undefined.
-  int? hdm;
+    /// Ground speed [km/h].  null if undefined.
+    int? gsp,
 
-  /// True heading [degrees].  null if undefined.
-  int? hdt;
+    /// Indicated airspeed [km/h].  null if undefined.
+    int? ias,
 
-  /// Magnetic track [degrees].  null if undefined.
-  int? trm;
+    /// True airspeed [km/h].  null if undefined.
+    int? tas,
 
-  /// True track [degrees].  null if undefined.
-  int? trt;
+    /// Satellites in use.  null if undefined.
+    int? siu,
+  }) = _IGCFix;
 
-  /// Ground speed [km/h].  null if undefined.
-  int? gsp;
-
-  /// Indicated airspeed [km/h].  null if undefined.
-  int? ias;
-
-  /// True airspeed [km/h].  null if undefined.
-  int? tas;
-
-  /// Satellites in use.  null if undefined.
-  int? siu;
-
-   void clearExtensions()  {
+  void clearExtensions() {
     enl = rpm = null;
     hdm = hdt = trm = trt = null;
     gsp = ias = tas = null;
@@ -64,14 +62,14 @@ class IGCFix
   }
 
   //  void class namePainter extends CustomPainter {
-   
+
   //    @override
   //    void paint(Canvas canvas, Size size) {
   //    }
-   
+
   //    @override
   //    bool shouldRepaint(namePainter oldDelegate) => false;
-   
+
   //    @override
   //    bool shouldRebuildSemantics(namePainter oldDelegate) => false;
   //  }lear()  {
@@ -79,68 +77,69 @@ class IGCFix
   //   ClearExtensions();
   // }
 
-   bool isDefined()   {
+  bool isDefined() {
     return time.isPlausible();
   }
 
-  /// Copy data from the #NMEAInfo object into this.
-  ///
-  /// @return true if this object is a valid new fix
-  bool apply(const NMEAInfo &basic) {
-  if (!basic.timeAvailable) {
-    return false;
-  }
+//TODO (differently)
+//   /// Copy data from the #NMEAInfo object into this.
+//   ///
+//   /// @return true if this object is a valid new fix
+//   bool apply(const NMEAInfo &basic) {
+//   if (!basic.timeAvailable) {
+//     return false;
+//   }
 
-  if (!IsDefined() && !basic.locationAvailable) {
-    return false;
-  }
+//   if (!IsDefined() && !basic.locationAvailable) {
+//     return false;
+//   }
 
-  /* "Use A for a 3D fix and V for a 2D fix (no GPS altitude) or for
-     no GPS data" */
-  gpsValid = basic.locationAvailable && basic.gpsAltitudeAvailable;
+//   /* "Use A for a 3D fix and V for a 2D fix (no GPS altitude) or for
+//      no GPS data" */
+//   gpsValid = basic.locationAvailable && basic.gpsAltitudeAvailable;
 
-  if (basic.locationAvailable)
-    location = basic.location;
+//   if (basic.locationAvailable)
+//     location = basic.location;
 
-  time = basic.dateTimeUtc;
+//   time = basic.dateTimeUtc;
 
-  gpsAltitude = basic.gpsAltitudeAvailable
-    ? (int)basic.gpsAltitude
-    : 0;
+//   gpsAltitude = basic.gpsAltitudeAvailable
+//     ? (int)basic.gpsAltitude
+//     : 0;
 
-  pressureAltitude = basic.pressureAltitudeAvailable
-    ? (int)basic.pressureAltitude
-    : (basic.baroAltitudeAvailable
-       /* if there's only baro altitude and no QNH, assume baro
-          altitude is good enough */
-       ? (int)basic.baroAltitude
-       /* if all else fails, fall back to GPS altitude, to avoid
-          application bugs (SeeYou is known for display errors) */
-       : gpsAltitude);
+//   pressureAltitude = basic.pressureAltitudeAvailable
+//     ? (int)basic.pressureAltitude
+//     : (basic.baroAltitudeAvailable
+//        /* if there's only baro altitude and no QNH, assume baro
+//           altitude is good enough */
+//        ? (int)basic.baroAltitude
+//        /* if all else fails, fall back to GPS altitude, to avoid
+//           application bugs (SeeYou is known for display errors) */
+//        : gpsAltitude);
 
-  clearExtensions();
+//   clearExtensions();
 
-  enl = basic.engineNoiseLevelAvailable
-    ? (int?) basic.engineNoiseLevel
-    : null;
+//   enl = basic.engineNoiseLevelAvailable
+//     ? (int?) basic.engineNoiseLevel
+//     : null;
 
-  trt = basic.trackAvailable
-    ? (int?) basic.track.Degrees()
-    : null;
+//   trt = basic.trackAvailable
+//     ? (int?) basic.track.Degrees()
+//     : null;
 
-  gsp = basic.groundSpeedAvailable
-    ? (int?) Units.toUserUnit(basic.groundSpeed, Unit.kilometerPerHour)
-    : null;
+//   gsp = basic.groundSpeedAvailable
+//     ? (int?) Units.toUserUnit(basic.groundSpeed, Unit.kilometerPerHour)
+//     : null;
 
-  if (basic.airspeedAvailable) {
-    ias = (int?) Units.toUserUnit(basic.indicatedAirspeed, Unit.kilometerPerHour);
-    tas = (int?) Units.toUserUnit(basic.trueAirspeed, Unit.kilometerPerHour);
-  }
+//   if (basic.airspeedAvailable) {
+//     ias = (int?) Units.toUserUnit(basic.indicatedAirspeed, Unit.kilometerPerHour);
+//     tas = (int?) Units.toUserUnit(basic.trueAirspeed, Unit.kilometerPerHour);
+//   }
 
-  siu = basic.gps.satellitesUsedAvailable
-    ? (int?) basic.gps.satellitesUsed
-    : null;
+//   siu = basic.gps.satellitesUsedAvailable
+//     ? (int?) basic.gps.satellitesUsed
+//     : null;
 
-  return true;
-}
+//   return true;
+// }
 }
